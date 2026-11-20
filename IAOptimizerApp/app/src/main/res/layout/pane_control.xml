@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg">
+
+    <!-- Grupos de Control: tarjetas por sección con flecha de apertura. -->
+    <ScrollView
+        android:id="@+id/control_scroll"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:id="@+id/control_groups"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="@dimen/space_md" />
+    </ScrollView>
+
+    <!-- Subpanel dedicado de la tarjeta pulsada. -->
+    <LinearLayout
+        android:id="@+id/control_sub"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="@dimen/space_sm"
+            android:paddingEnd="@dimen/space_md"
+            android:paddingTop="@dimen/space_xs"
+            android:paddingBottom="@dimen/space_xs">
+
+            <ImageButton
+                android:id="@+id/control_back"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:background="@drawable/bg_pill"
+                android:padding="8dp"
+                android:src="@drawable/ic_back"
+                app:tint="@color/primary"
+                android:contentDescription="Volver a Control" />
+
+            <TextView
+                android:id="@+id/control_sub_title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="@dimen/space_xs"
+                android:text="Control"
+                android:textColor="@color/primary"
+                android:textSize="@dimen/text_title"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <FrameLayout
+            android:id="@+id/control_sub_content"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+    </LinearLayout>
+</FrameLayout>

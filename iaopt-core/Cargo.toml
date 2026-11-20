@@ -1,0 +1,10 @@
+[package]
+name = "iaopt-core"
+description = "Nucleo de IA Optimizer: perfiles, deteccion de interfaces kernel y motor adaptativo"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+
+[dependencies]
+# Intencionalmente sin dependencias: binario pequeno y compilacion cruzada siempre exitosa.

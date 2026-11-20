@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/bg_card"
+    android:padding="@dimen/space_lg"
+    android:layout_marginTop="@dimen/space_md">
+
+    <TextView
+        style="@style/SectionTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Pantalla" />
+
+    <TextView
+        style="@style/CardTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_md"
+        android:text="Tasa de refresco" />
+
+    <TextView
+        style="@style/CardHint"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Veces por segundo que se redibuja la imagen." />
+
+    <TextView
+        android:id="@+id/displayRefresh"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="—"
+        android:textColor="@color/primary"
+        android:textSize="@dimen/text_title"
+        android:textStyle="bold" />
+
+    <TextView
+        style="@style/CardTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_lg"
+        android:text="Frecuencia de actualización" />
+    <TextView
+        style="@style/CardHint"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Fluidez de la pantalla. Más Hz, más consumo." />
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/refreshLayout"
+        style="@style/Widget.IAOptimizer.Spinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_sm"
+        android:hint="Refresco">
+        <com.google.android.material.textfield.MaterialAutoCompleteTextView
+            android:id="@+id/refreshValue"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="none"
+            android:textColor="@color/text" />
+    </com.google.android.material.textfield.TextInputLayout>
+    <TextView
+        style="@style/CardTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_lg"
+        android:text="Motor de renderizado" />
+
+    <TextView
+        style="@style/CardHint"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Cómo se dibuja la interfaz. Elige una opción." />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/rendererLayout"
+        style="@style/Widget.IAOptimizer.Spinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_sm"
+        android:hint="Renderizador">
+
+        <com.google.android.material.textfield.MaterialAutoCompleteTextView
+            android:id="@+id/rendererValue"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="none"
+            android:textColor="@color/text" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <TextView
+        style="@style/CardTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_lg"
+        android:text="Resolución" />
+
+    <TextView
+        style="@style/CardHint"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Cantidad de píxeles del panel." />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/resolutionLayout"
+        style="@style/Widget.IAOptimizer.Spinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_sm"
+        android:hint="Resolución">
+
+        <com.google.android.material.textfield.MaterialAutoCompleteTextView
+            android:id="@+id/resolutionValue"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="none"
+            android:textColor="@color/text" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnDisplayApply"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_lg"
+        android:text="Aplicar ajustes de pantalla" />
+</LinearLayout>

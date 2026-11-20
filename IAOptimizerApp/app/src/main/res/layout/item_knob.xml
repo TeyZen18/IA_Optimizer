@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/bg_card"
+    android:padding="@dimen/space_lg"
+    android:layout_marginBottom="@dimen/space_sm">
+
+    <TextView
+        android:id="@+id/knobTitle"
+        style="@style/CardTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Frecuencia máxima del procesador" />
+
+    <TextView
+        android:id="@+id/knobHint"
+        style="@style/CardHint"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:text="Velocidad tope de la CPU." />
+
+    <TextView
+        android:id="@+id/knobValue"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_sm"
+        android:text="—"
+        android:textColor="@color/primary"
+        android:textSize="@dimen/text_title"
+        android:textStyle="bold" />
+
+    <com.google.android.material.slider.Slider
+        android:id="@+id/knobSlider"
+        style="@style/Widget.IAOptimizer.Slider"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_sm"
+        android:visibility="gone" />
+
+    <com.google.android.material.button.MaterialButtonToggleGroup
+        android:id="@+id/knobChoices"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_sm"
+        app:singleSelection="true"
+        app:selectionRequired="true"
+        android:visibility="gone" />
+</LinearLayout>

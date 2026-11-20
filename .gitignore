@@ -1,0 +1,92 @@
+# ============================================================
+#  IA Optimizer — .gitignore
+#  Entorno híbrido: Android (Gradle/Kotlin) + Rust (Cargo)
+#  + módulo systemless KernelSU/Magisk/APatch
+# ============================================================
+
+# ---------- Android / Gradle / Kotlin ----------
+.gradle/
+**/build/
+build/
+app/build/
+.cxx/
+.externalNativeBuild/
+.kotlin/
+captures/
+*.iml
+.idea/
+local.properties
+gradle-app.setting
+*.apk
+*.aab
+*.ap_
+*.dex
+*.class
+release/
+
+# El wrapper de Gradle SÍ se versiona (necesario para compilar sin instalar Gradle):
+!gradle/wrapper/gradle-wrapper.jar
+!gradlew
+!gradlew.bat
+
+# ---------- Rust / Cargo ----------
+target/
+**/target/
+# Cargo.lock SÍ se versiona: el workspace produce un binario (iaopt)
+# y el lock garantiza builds reproducibles del daemon. No ignorar.
+*.rs.bk
+*.pdb
+
+# ---------- Paquetes y artefactos comprimidos ----------
+*.zip
+*.tar.gz
+*.tgz
+*.tar
+*.7z
+*.rar
+
+# ---------- Llaves de firma y secretos ----------
+*.jks
+*.keystore
+keystore.properties
+signing.properties
+*.pem
+*.key
+*.p12
+*.pfx
+.env
+.env.*
+secrets.properties
+
+# ---------- Temporales del SO y editores ----------
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+ehthumbs.db
+desktop.ini
+*.log
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+*.bak
+*.orig
+
+# ---------- Python (scripts de verificación en tools/) ----------
+__pycache__/
+*.pyc
+*.pyo
+
+# ---------- Toolchain portátil local (JDK/Gradle junto al script) ----------
+IAOptimizerApp/toolchain/
+toolchain/
+
+# ---------- Documentación interna de sesiones de desarrollo ----------
+# Contienen rutas locales y notas de trabajo; se conservan en disco
+# pero no se publican. La documentación pública es README.md y NOTICE.md.
+docs/sesion-*/
+docs/**/evidence-*.txt

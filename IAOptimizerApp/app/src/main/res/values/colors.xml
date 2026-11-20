@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Tema claro: el mismo verde-cian, con acentos algo mas oscuros para
+         mantener el contraste sobre fondo blanco. -->
+    <color name="bg">#F2F7F4</color>
+    <color name="surface">#FFFFFF</color>
+    <color name="surface_variant">#E3EEE8</color>
+    <color name="surface_high">#D3E6DD</color>
+
+    <color name="primary">#0E9F6E</color>
+    <color name="primary_dark">#0B7A55</color>
+    <color name="on_primary">#FFFFFF</color>
+    <color name="secondary">#0E7490</color>
+
+    <color name="on_surface">#10201B</color>
+    <color name="on_surface_variant">#4B5C56</color>
+    <color name="text">#10201B</color>
+    <color name="text_dim">#4B5C56</color>
+    <color name="outline">#C9DCD3</color>
+
+    <color name="card_bg">#FFFFFF</color>
+    <color name="card_stroke">#C9DCD3</color>
+
+    <color name="success">#0E9F6E</color>
+    <color name="warning">#B45309</color>
+    <color name="error">#DC2626</color>
+    <color name="game">#0E7490</color>
+</resources>

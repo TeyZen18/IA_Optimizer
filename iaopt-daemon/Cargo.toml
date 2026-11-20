@@ -1,0 +1,14 @@
+[package]
+name = "iaopt-daemon"
+description = "Demonio de IA Optimizer: WebUI local + API + aplicacion de ajustes kernel"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+
+[dependencies]
+iaopt-core = { path = "../iaopt-core" }
+
+[[bin]]
+name = "iaopt"
+path = "src/main.rs"

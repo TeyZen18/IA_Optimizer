@@ -1,0 +1,364 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/bg"
+    android:fitsSystemWindows="true">
+
+    <!-- Encabezado con indicador EN VIVO -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="@dimen/space_sm"
+        android:paddingEnd="@dimen/space_md"
+        android:paddingTop="@dimen/space_xs"
+        android:paddingBottom="@dimen/space_xs">
+
+        <ImageButton
+            android:id="@+id/cc_back"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:background="@drawable/bg_pill"
+            android:padding="8dp"
+            android:src="@drawable/ic_back"
+            app:tint="@color/primary"
+            android:contentDescription="Volver" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="@dimen/space_sm"
+            android:text="Comandos en Línea"
+            android:textColor="@color/primary"
+            android:textSize="@dimen/text_title"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:background="@drawable/bg_pill"
+            android:paddingStart="@dimen/space_md"
+            android:paddingEnd="@dimen/space_md"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp">
+
+            <View
+                android:id="@+id/cc_live_dot"
+                android:layout_width="8dp"
+                android:layout_height="8dp"
+                android:background="@drawable/bg_pill_selected" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:text="EN VIVO"
+                android:textColor="@color/primary"
+                android:textSize="@dimen/text_label"
+                android:textStyle="bold" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="@dimen/space_md">
+
+            <!-- Vitales en cuadrícula 2x2 -->
+            <GridLayout
+                android:id="@+id/cc_vitals"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:columnCount="2"
+                android:useDefaultMargins="false" />
+
+            <!-- Satisfacción objetiva + tendencia -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_card"
+                android:padding="@dimen/space_lg"
+                android:layout_marginTop="@dimen/space_sm">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Satisfacción objetiva"
+                        android:textColor="@color/text_dim"
+                        android:textSize="@dimen/text_caption" />
+
+                    <TextView
+                        android:id="@+id/cc_sat_badge"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/bg_pill"
+                        android:paddingStart="@dimen/space_md"
+                        android:paddingEnd="@dimen/space_md"
+                        android:paddingTop="3dp"
+                        android:paddingBottom="3dp"
+                        android:text="—"
+                        android:textColor="@color/text"
+                        android:textSize="@dimen/text_label" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/cc_sat_value"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="monospace"
+                    android:text="—"
+                    android:textColor="@color/primary"
+                    android:textSize="40sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/cc_sat_target"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Objetivo —"
+                    android:textColor="@color/text"
+                    android:textSize="@dimen/text_caption" />
+
+                <io.teyzen.iaoptimizer.ui.SparklineView
+                    android:id="@+id/cc_spark_sat"
+                    android:layout_width="match_parent"
+                    android:layout_height="90dp"
+                    android:layout_marginTop="@dimen/space_sm" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Tendencia de satisfacción de esta sesión de observación"
+                    android:textColor="@color/text_dim"
+                    android:textSize="@dimen/text_label" />
+            </LinearLayout>
+
+            <!-- Predicción térmica: predicho vs real -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_card"
+                android:padding="@dimen/space_lg"
+                android:layout_marginTop="@dimen/space_sm">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Predicción térmica del motor"
+                    android:textColor="@color/text"
+                    android:textSize="@dimen/text_body"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/cc_pred_verdict"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="—"
+                    android:textColor="@color/text_dim"
+                    android:textSize="@dimen/text_label" />
+
+                <io.teyzen.iaoptimizer.ui.SparklineView
+                    android:id="@+id/cc_spark_thermal"
+                    android:layout_width="match_parent"
+                    android:layout_height="110dp"
+                    android:layout_marginTop="@dimen/space_sm" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="@dimen/space_xs">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="― real"
+                        android:textColor="@color/primary"
+                        android:textSize="@dimen/text_label" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/space_lg"
+                        android:text="┄ predicho"
+                        android:textColor="@color/secondary"
+                        android:textSize="@dimen/text_label" />
+
+                    <TextView
+                        android:id="@+id/cc_pred_error"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="end"
+                        android:text="—"
+                        android:textColor="@color/text_dim"
+                        android:textSize="@dimen/text_label" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Convergencia del error -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_card"
+                android:padding="@dimen/space_lg"
+                android:layout_marginTop="@dimen/space_sm">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Convergencia del error de predicción"
+                    android:textColor="@color/text"
+                    android:textSize="@dimen/text_body"
+                    android:textStyle="bold" />
+
+                <io.teyzen.iaoptimizer.ui.SparklineView
+                    android:id="@+id/cc_spark_error"
+                    android:layout_width="match_parent"
+                    android:layout_height="80dp"
+                    android:layout_marginTop="@dimen/space_sm" />
+
+                <TextView
+                    android:id="@+id/cc_error_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="—"
+                    android:textColor="@color/text_dim"
+                    android:textSize="@dimen/text_label" />
+            </LinearLayout>
+
+            <!-- Matriz de conocimiento -->
+            <TextView
+                style="@style/SectionTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_lg"
+                android:text="Conocimiento por clúster" />
+
+            <LinearLayout
+                android:id="@+id/cc_knowledge"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
+
+            <!-- Puerta de exploración + plan -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_card"
+                android:padding="@dimen/space_lg"
+                android:layout_marginTop="@dimen/space_sm">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Exploración y plan de control"
+                    android:textColor="@color/text"
+                    android:textSize="@dimen/text_body"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/cc_gate"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_xs"
+                    android:text="—"
+                    android:textColor="@color/text_dim"
+                    android:textSize="@dimen/text_caption" />
+
+                <TextView
+                    android:id="@+id/cc_plan"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_xs"
+                    android:text="—"
+                    android:textColor="@color/text"
+                    android:textSize="@dimen/text_caption" />
+
+                <ProgressBar
+                    android:id="@+id/cc_coverage_bar"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="6dp"
+                    android:layout_marginTop="@dimen/space_sm"
+                    android:max="100"
+                    android:progress="0"
+                    android:progressDrawable="@drawable/bar_metric" />
+
+                <TextView
+                    android:id="@+id/cc_coverage_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="Cobertura verificada: —"
+                    android:textColor="@color/text_dim"
+                    android:textSize="@dimen/text_label" />
+            </LinearLayout>
+
+            <!-- Auditoría de bucles -->
+            <TextView
+                style="@style/SectionTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_lg"
+                android:text="Auditoría de bucles" />
+
+            <GridLayout
+                android:id="@+id/cc_audit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:columnCount="2"
+                android:useDefaultMargins="false" />
+
+            <!-- Propiedad de controles -->
+            <TextView
+                style="@style/SectionTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_lg"
+                android:text="Propiedad de los límites" />
+
+            <LinearLayout
+                android:id="@+id/cc_ownership"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
+
+            <TextView
+                android:id="@+id/cc_footer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_md"
+                android:gravity="center"
+                android:text="Conectando con el motor…"
+                android:textColor="@color/text_dim"
+                android:textSize="@dimen/text_label" />
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

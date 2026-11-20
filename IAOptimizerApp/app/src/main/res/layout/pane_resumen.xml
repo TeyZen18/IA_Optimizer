@@ -1,0 +1,730 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/space_md">
+
+        <!-- [2] TARJETA MAESTRA DE ENCENDIDO -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:background="@drawable/bg_card"
+            android:padding="@dimen/space_lg">
+
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/bg_pill"
+                android:padding="8dp"
+                android:src="@drawable/ic_bolt"
+                app:tint="@color/primary"
+                android:contentDescription="IA Motors" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:layout_marginStart="@dimen/space_md">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="IA Motors"
+                    android:textColor="@color/text"
+                    android:textSize="@dimen/text_body"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/master_subtitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="Gobierna el sistema por ti"
+                    android:textColor="@color/text_dim"
+                    android:textSize="@dimen/text_label" />
+            </LinearLayout>
+
+            <com.google.android.material.materialswitch.MaterialSwitch
+                android:id="@+id/switch_master"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
+        <!-- [3] ÁRBOL DE CAPACIDADES -->
+        <LinearLayout
+            android:id="@+id/card_capabilities"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:background="@drawable/bg_card"
+            android:padding="@dimen/space_lg"
+            android:layout_marginTop="@dimen/space_sm"
+            android:clickable="true"
+            android:focusable="true">
+
+            <ImageView
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@drawable/ic_tree"
+                app:tint="@color/secondary"
+                android:contentDescription="Capacidades" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:layout_marginStart="@dimen/space_md">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="¿Qué hace IA Motors?"
+                    android:textColor="@color/text"
+                    android:textSize="@dimen/text_body"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="El árbol de capacidades IA Motors"
+                    android:textColor="@color/text_dim"
+                    android:textSize="@dimen/text_label" />
+            </LinearLayout>
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_chevron"
+                app:tint="@color/text_dim"
+                android:contentDescription="Abrir" />
+        </LinearLayout>
+
+        <!-- [5] MEDIDO AHORA -->
+        <TextView
+            style="@style/SectionTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_lg"
+            android:text="Medido ahora" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Lecturas del último ciclo del motor. Aquí no se estima nada."
+            android:textColor="@color/text_dim"
+            android:textSize="@dimen/text_label" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/bg_card"
+            android:padding="@dimen/space_lg"
+            android:layout_marginTop="@dimen/space_sm">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Satisfacción objetiva"
+                    android:textColor="@color/text_dim"
+                    android:textSize="@dimen/text_caption" />
+
+                <TextView
+                    android:id="@+id/sat_badge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_pill"
+                    android:paddingStart="@dimen/space_md"
+                    android:paddingEnd="@dimen/space_md"
+                    android:paddingTop="3dp"
+                    android:paddingBottom="3dp"
+                    android:text="En espera"
+                    android:textColor="@color/text"
+                    android:textSize="@dimen/text_label" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/sat_value"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_xs"
+                android:fontFamily="monospace"
+                android:text="—"
+                android:textColor="@color/primary"
+                android:textSize="44sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/sat_target"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Objetivo — · planificador —"
+                android:textColor="@color/text"
+                android:textSize="@dimen/text_caption" />
+
+            <TextView
+                android:id="@+id/sat_updated"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="Sin lecturas todavía"
+                android:textColor="@color/text_dim"
+                android:textSize="@dimen/text_label" />
+        </LinearLayout>
+
+        <io.teyzen.iaoptimizer.ui.SparklineView
+            android:id="@+id/chart_history"
+            android:layout_width="match_parent"
+            android:layout_height="120dp"
+            android:layout_marginTop="@dimen/space_sm"
+            android:background="@drawable/bg_card"
+            android:padding="@dimen/space_md" />
+
+        <TextView
+            android:id="@+id/chart_caption"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_xs"
+            android:fontFamily="monospace"
+            android:text="—"
+            android:textColor="@color/text_dim"
+            android:textSize="@dimen/text_label" />
+
+        <!-- [6] LECTURAS DEL SISTEMA EN TIEMPO REAL -->
+        <TextView
+            style="@style/SectionTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_lg"
+            android:text="Lecturas del sistema" />
+
+        <LinearLayout
+            android:id="@+id/live_box"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/bg_card"
+            android:paddingStart="@dimen/space_lg"
+            android:paddingEnd="@dimen/space_lg"
+            android:paddingTop="@dimen/space_sm"
+            android:paddingBottom="@dimen/space_sm"
+            android:layout_marginTop="@dimen/space_xs" />
+
+        <!-- [7] PRESUPUESTO DE CALOR SOSTENIDO -->
+        <TextView
+            style="@style/SectionTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_lg"
+            android:text="Presupuesto de calor sostenido" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Tiempo desde el inicio de una sesión intensa hasta la primera caída de seguridad, medido en este dispositivo."
+            android:textColor="@color/text_dim"
+            android:textSize="@dimen/text_label" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:background="@drawable/bg_card"
+            android:padding="@dimen/space_lg"
+            android:layout_marginTop="@dimen/space_sm">
+
+            <ImageView
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@drawable/ic_diamond"
+                app:tint="@color/warning"
+                android:contentDescription="Calor" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:layout_marginStart="@dimen/space_md">
+
+                <TextView
+                    android:id="@+id/heat_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Medido en este dispositivo"
+                    android:textColor="@color/text"
+                    android:textSize="@dimen/text_body"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/heat_hint"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="Aún no se ha medido ninguna sesión pesada."
+                    android:textColor="@color/text_dim"
+                    android:textSize="@dimen/text_label" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- [8] PARA QUÉ ESTÁ OPTIMIZANDO -->
+        <TextView
+            style="@style/SectionTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_lg"
+            android:text="Para qué está optimizando" />
+
+        <TextView
+            android:id="@+id/goal_desc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="El modo establece el sistema preestablecido y para qué optimiza la IA. Tu preferencia decide los pesos."
+            android:textColor="@color/text_dim"
+            android:textSize="@dimen/text_label" />
+
+        <com.google.android.material.button.MaterialButtonToggleGroup
+            android:id="@+id/goal_group"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_sm"
+            app:singleSelection="true"
+            app:selectionRequired="true">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_goal_actuacion"
+                style="@style/ProfileButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Actuación" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_goal_equilibrado"
+                style="@style/ProfileButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Equilibrado" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_goal_bateria"
+                style="@style/ProfileButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Batería" />
+        </com.google.android.material.button.MaterialButtonToggleGroup>
+
+        <!-- [9] COMPORTAMIENTO DE INTERVENCIÓN -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/bg_card"
+            android:padding="@dimen/space_lg"
+            android:layout_marginTop="@dimen/space_md">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <ImageView
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:src="@drawable/ic_sliders"
+                    app:tint="@color/secondary"
+                    android:contentDescription="Intervención" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:layout_marginStart="@dimen/space_md">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Comportamiento de intervención"
+                        android:textColor="@color/text"
+                        android:textSize="@dimen/text_body"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="Cómo actúa ante una brecha medida mientras el error sigue siendo de bajo coste."
+                        android:textColor="@color/text_dim"
+                        android:textSize="@dimen/text_label" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <com.google.android.material.button.MaterialButtonToggleGroup
+                android:id="@+id/behavior_group"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_md"
+                app:singleSelection="true"
+                app:selectionRequired="true">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_behavior_calma"
+                    style="@style/ProfileButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Calma" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_behavior_equilibrado"
+                    style="@style/ProfileButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Equilibrado" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_behavior_decisivo"
+                    style="@style/ProfileButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Decisivo" />
+            </com.google.android.material.button.MaterialButtonToggleGroup>
+        </LinearLayout>
+
+        <!-- [10] PREAJUSTE DEL SISTEMA + PESOS -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/bg_card"
+            android:padding="@dimen/space_lg"
+            android:layout_marginTop="@dimen/space_md">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <ImageView
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:src="@drawable/ic_sliders"
+                    app:tint="@color/primary"
+                    android:contentDescription="Preajuste" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:layout_marginStart="@dimen/space_md">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Preajuste del sistema"
+                        android:textColor="@color/text"
+                        android:textSize="@dimen/text_body"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/preset_subtitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="Perfil activo: —"
+                        android:textColor="@color/text_dim"
+                        android:textSize="@dimen/text_label" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/objectives_box"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="@dimen/space_sm" />
+        </LinearLayout>
+
+        <!-- [11] SEGURIDAD TÉRMICA -->
+        <TextView
+            style="@style/SectionTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_lg"
+            android:text="Seguridad térmica" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Estado de vida del gobernador, frecuencia de intervención y aplicación efectiva del límite."
+            android:textColor="@color/text_dim"
+            android:textSize="@dimen/text_label" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/bg_card"
+            android:padding="@dimen/space_lg"
+            android:layout_marginTop="@dimen/space_sm">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <ImageView
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:src="@drawable/ic_thermo"
+                    app:tint="@color/warning"
+                    android:contentDescription="Gobernador" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:layout_marginStart="@dimen/space_md">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Estado del gobernador"
+                        android:textColor="@color/text"
+                        android:textSize="@dimen/text_body"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/thermal_gov_hint"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="Sin lecturas todavía"
+                        android:textColor="@color/text_dim"
+                        android:textSize="@dimen/text_label" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/thermal_gov_badge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_pill"
+                    android:paddingStart="@dimen/space_md"
+                    android:paddingEnd="@dimen/space_md"
+                    android:paddingTop="3dp"
+                    android:paddingBottom="3dp"
+                    android:text="Normal"
+                    android:textColor="@color/text"
+                    android:textSize="@dimen/text_label" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="@dimen/space_md"
+                android:layout_marginBottom="@dimen/space_md"
+                android:background="@color/outline" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <ImageView
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:src="@drawable/ic_shield"
+                    app:tint="@color/success"
+                    android:contentDescription="Tope" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:layout_marginStart="@dimen/space_md">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Aplicación del tope"
+                        android:textColor="@color/text"
+                        android:textSize="@dimen/text_body"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/thermal_cap_hint"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="Sin lecturas todavía"
+                        android:textColor="@color/text_dim"
+                        android:textSize="@dimen/text_label" />
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- [12] ÚLTIMA EVIDENCIA + CENTRO EN VIVO -->
+        <TextView
+            style="@style/SectionTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_lg"
+            android:text="Última evidencia" />
+
+        <LinearLayout
+            android:id="@+id/evidence_card"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/bg_card"
+            android:padding="@dimen/space_lg"
+            android:layout_marginTop="@dimen/space_xs">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:id="@+id/evidence_title"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Sin evidencia todavía"
+                    android:textColor="@color/text"
+                    android:textSize="@dimen/text_body"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/evidence_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_pill"
+                    android:paddingStart="@dimen/space_md"
+                    android:paddingEnd="@dimen/space_md"
+                    android:paddingTop="3dp"
+                    android:paddingBottom="3dp"
+                    android:text="—"
+                    android:textColor="@color/text"
+                    android:textSize="@dimen/text_label" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/evidence_kind"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_sm"
+                android:background="@drawable/bg_pill_selected"
+                android:paddingStart="@dimen/space_md"
+                android:paddingEnd="@dimen/space_md"
+                android:paddingTop="3dp"
+                android:paddingBottom="3dp"
+                android:text="—"
+                android:textColor="@color/primary"
+                android:textSize="@dimen/text_label" />
+
+            <TextView
+                android:id="@+id/evidence_body"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_sm"
+                android:text="El motor registrará aquí su última decisión medida con antes y después."
+                android:textColor="@color/text_dim"
+                android:textSize="@dimen/text_caption" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/card_command"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:background="@drawable/bg_card_accent"
+            android:padding="@dimen/space_lg"
+            android:layout_marginTop="@dimen/space_sm"
+            android:clickable="true"
+            android:focusable="true">
+
+            <ImageView
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@drawable/ic_pulse"
+                app:tint="@color/primary"
+                android:contentDescription="Centro en vivo" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:layout_marginStart="@dimen/space_md">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Comandos en Línea"
+                    android:textColor="@color/text"
+                    android:textSize="@dimen/text_body"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="Panel profesional del motor, en vivo y con gráficos"
+                    android:textColor="@color/text_dim"
+                    android:textSize="@dimen/text_label" />
+            </LinearLayout>
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_chevron"
+                app:tint="@color/text_dim"
+                android:contentDescription="Abrir" />
+        </LinearLayout>
+
+        <!-- Avisos del kernel y errores sin resolver (se pintan por código) -->
+        <LinearLayout
+            android:id="@+id/resumenBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="@dimen/space_md" />
+    </LinearLayout>
+</ScrollView>

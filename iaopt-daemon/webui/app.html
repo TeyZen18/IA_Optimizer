@@ -1,0 +1,2218 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>IA Optimizer · TeyZen</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+ --bg:#0d0e12;--card:#16171d;--card2:#1d1e25;--btn:#22232b;
+ --line:rgba(255,255,255,.07);--text:#f2f5f9;--mut:#9aa3b2;
+ --accent:#7ea6e0;--accent2:#9b8cf0;--pill:#314061;--pilltext:#cdd8f5;
+ --g1:#7ea6e0;--g2:#9b8cf0;--grad:linear-gradient(135deg,#314061,#4a5f95);
+ --warn:#fbbf24;--bad:#f87171;--ok:#5fbf7a;
+ --r:20px;--mono:ui-monospace,'Roboto Mono',monospace;
+}
+html,body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 system-ui,-apple-system,'Segoe UI',sans-serif}
+body{max-width:560px;margin:0 auto;padding:0 14px 210px}
+h2{font-size:15px;margin:0;font-weight:700}
+.label{font-size:10px;letter-spacing:.08em;color:var(--mut);font-weight:700;text-transform:uppercase}
+.value{font-family:var(--mono);font-size:22px;font-weight:600}
+.value.sm{font-size:13px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px;margin-bottom:12px}
+.card-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px}
+.chip{border:1px solid var(--line);background:var(--card2);border-radius:999px;padding:4px 10px;font-size:11px;color:var(--mut)}
+.chip.sm{font-size:10.5px;padding:3px 8px}
+.chip.ok{color:var(--ok);border-color:rgba(95,191,122,.4)}
+.chip.warn{color:var(--warn);border-color:rgba(251,191,36,.35)}
+.chip.bad{color:var(--bad);border-color:rgba(248,113,113,.35)}
+.badge{display:inline-block;border:1px solid rgba(126,166,224,.45);color:var(--accent);border-radius:999px;padding:2px 8px;font-size:10.5px;font-weight:700}
+.badge.warn{border-color:rgba(251,191,36,.4);color:var(--warn)}
+.badge.bad{border-color:rgba(248,113,113,.4);color:var(--bad)}
+.hint{font-size:10.5px;color:var(--mut);margin-top:4px;line-height:1.35}
+.empty{color:var(--mut);font-size:12.5px;text-align:center;padding:14px}
+.reason{color:var(--mut);font-size:12.5px;margin:8px 0}
+.log{font-family:var(--mono);font-size:11px;color:var(--mut);white-space:pre-wrap;max-height:150px;overflow:auto;background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:10px}
+.log:empty{display:none}
+.action{width:100%;border:1px solid var(--line);background:var(--card2);color:var(--text);border-radius:14px;padding:12px;font-weight:700;margin-bottom:8px}
+.action:active{transform:translateY(1px)}
+.action.sm{padding:8px;font-size:12px;margin-top:8px}
+.about p{color:var(--mut);font-size:12.5px;margin:6px 0 0}
+.dec{display:flex;justify-content:space-between;gap:10px;border:1px solid var(--line);background:var(--card2);border-radius:12px;padding:10px 12px;font-size:12px}
+.dec b{font-family:var(--mono)}
+.kv{display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);font-size:13px}
+.kv:last-child{border-bottom:0}
+.kv span{color:var(--mut)}
+.kv b{font-family:var(--mono);font-weight:600;text-align:right}
+.modes{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.modebtn{flex:1;background:var(--card);border:1px solid var(--line);color:var(--text);border-radius:10px;padding:10px;font:600 13px/1.2 system-ui;cursor:pointer}
+.modebtn.on{background:var(--pill);color:var(--pilltext);border-color:transparent}
+.modebtn.rec{border-color:var(--accent);color:var(--accent)}
+.tabs{display:flex;gap:6px;margin:12px 0;overflow-x:auto}
+.tbtn{flex:1;background:var(--card);border:1px solid var(--line);color:var(--mut);border-radius:12px;padding:10px;font:700 12px/1.2 system-ui;cursor:pointer;white-space:nowrap}
+.tbtn.on{background:var(--pill);color:var(--pilltext);border-color:transparent}
+.mtpane{display:none}
+.profiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}
+.profiles.locked{pointer-events:none;opacity:.42;filter:grayscale(.5)}
+.profiles button{border:1px solid var(--line);background:var(--card2);color:var(--mut);border-radius:14px;padding:11px 6px;font-weight:700;font-size:12.5px}
+.profiles button.on{background:var(--pill);color:var(--pilltext);border-color:transparent}
+.rowopts{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.switchrow{flex:1;min-width:150px;display:flex;justify-content:space-between;align-items:center;gap:8px;background:var(--card2);border:1px solid var(--line);border-radius:14px;padding:10px 12px;font-size:12.5px;color:var(--mut)}
+.switch{width:42px;height:24px;border-radius:999px;background:#2a3240;position:relative;transition:.2s;flex:0 0 auto;cursor:pointer}
+.switch::after{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#cbd5e1;transition:.2s}
+.switch.on{background:var(--accent)}
+.switch.on::after{transform:translateX(18px);background:#0d1220}
+canvas{width:100%;height:96px;display:block;background:var(--card2);border:1px solid var(--line);border-radius:14px}
+.legend{display:flex;gap:14px;color:var(--mut);font-size:11px;margin-top:8px}
+.legend .k{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:5px}
+.k.cpu{background:var(--accent)}.k.temp{background:var(--warn)}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.stat{padding:14px}
+.stat .value{margin-top:6px}
+.hero-top{display:flex;justify-content:space-between;gap:12px;margin-bottom:6px}
+.temp{font-family:var(--mono);font-size:52px;font-weight:700;line-height:1;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.temp .unit{font-size:20px;margin-left:2px}
+.hero-right{text-align:right;min-width:112px}
+.hero-right .big{font-size:19px;font-weight:750}
+.confbar{height:6px;border-radius:999px;background:#202634;overflow:hidden;margin-top:8px}
+.confbar i{display:block;height:100%;width:0;background:var(--grad);border-radius:999px;transition:width .4s}
+.decisions{display:flex;flex-direction:column;gap:8px}
+.freqbar{display:grid;grid-template-columns:1fr 1.2fr 1fr;gap:8px;margin-bottom:10px}
+.freq{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:8px;text-align:center}
+.freq .label{display:block;color:var(--mut);font-size:10px;text-transform:uppercase;letter-spacing:.4px}
+.freq b{font-size:15px}
+.freq.cur{border-color:var(--accent)}
+.livegrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.live{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:10px}
+.live .label{display:block;color:var(--mut);font-size:10px;text-transform:uppercase;letter-spacing:.4px}
+.live b{font-size:14px}
+.memrow{display:grid;grid-template-columns:96px 1fr 104px;gap:10px;align-items:center;margin-top:10px;font-size:12px}
+.memrow .label{color:var(--mut)}
+.memrow b{text-align:right;font-family:var(--mono)}
+.bar{height:8px;border-radius:6px;background:var(--card2);overflow:hidden;border:1px solid var(--line)}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--g1),var(--g2));transition:width .4s}
+.group-title{font-size:13px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:var(--mut);margin:16px 2px 8px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.catcard{background:var(--card);border:1px solid var(--line);border-left:3px solid var(--c,#7ea6e0);border-radius:16px;padding:12px;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:6px;font:inherit;color:var(--text)}
+.catcard .t{font-weight:800;font-size:14px}
+.catcard .d{color:var(--mut);font-size:11.5px;line-height:1.35}
+.catcard .go{color:var(--c,#7ea6e0);font-size:11px;font-weight:700}
+.knob{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px;margin-bottom:10px}
+.knob .cur{font-family:var(--mono);font-size:19px;margin:6px 0;word-break:break-all}
+.knob .acts{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.knob .acts button{border:1px solid var(--line);background:var(--card2);color:var(--text);border-radius:10px;padding:7px 10px;font-size:11.5px;font-weight:600}
+.knob .acts button.on{background:var(--pill);color:var(--pilltext);border-color:transparent}
+.knob .badge{font-size:10px;color:var(--mut);border:1px solid var(--line);border-radius:6px;padding:2px 6px}
+.knob .desc{font-size:11.5px;color:var(--mut);margin:6px 0 0;line-height:1.35}
+.knob .head{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.knob .ico{width:30px;height:30px;border-radius:10px;background:var(--card2);display:grid;place-items:center;color:var(--accent);font-size:14px;flex:0 0 auto}
+.knob .ttl{font-weight:700;font-size:14px;flex:1 1 auto;min-width:0}
+.knob .head-actions{display:flex;align-items:center;gap:8px;flex:0 0 auto}
+.knob.off{opacity:.55}
+.knob.off .acts{pointer-events:none;opacity:.5}
+.knob.off .switch{pointer-events:auto;opacity:1}
+.knob .tech{display:none;margin-top:8px;font-family:var(--mono);font-size:10px;color:var(--mut);word-break:break-all;border-top:1px solid var(--line);padding-top:8px}
+.knob .tech.open{display:block}
+.knob .tgl{font-size:10.5px;color:var(--accent);margin-top:8px;display:inline-block;cursor:pointer}
+.sliderow{display:flex;align-items:center;gap:10px;margin-top:6px}
+.sliderow input[type=range]{flex:1;accent-color:var(--accent)}
+.sliderow b{font-family:var(--mono);font-size:13px;min-width:64px;text-align:right}
+.search{width:100%;background:var(--card2);border:1px solid var(--line);border-radius:12px;color:var(--text);padding:11px 12px;font:600 13px/1.2 system-ui}
+.applist{display:flex;flex-direction:column;gap:8px;max-height:52vh;overflow-y:auto}
+.approw{display:flex;align-items:center;gap:12px;border:1px solid var(--line);background:var(--card2);border-radius:14px;padding:10px 12px;cursor:pointer;text-align:left}
+.approw:hover{border-color:var(--accent)}
+.gsicon.sm{width:40px;height:40px;border-radius:12px;font-size:17px;margin:0;flex:0 0 auto}
+.appmeta{flex:1;display:flex;flex-direction:column;gap:2px;min-width:0}
+.appmeta b{font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.appmeta span{color:var(--mut);font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gsstatus{display:flex;gap:10px;flex-wrap:wrap;margin:4px 0 10px;font-size:11.5px;color:var(--mut)}
+.gsstatus span{border:1px solid var(--line);background:var(--card2);border-radius:999px;padding:5px 10px;display:flex;gap:6px;align-items:center}
+.gscarousel{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;padding:6px 2px;scrollbar-width:none}
+.gscarousel::-webkit-scrollbar{display:none}
+.gscard{flex:0 0 78%;max-width:340px;scroll-snap-align:center;background:linear-gradient(160deg,#1a1c24,#0b0e14);border:1px solid rgba(248,113,113,.25);border-radius:22px;padding:16px;text-align:center}
+.gscard.sel{border-color:#f87171;box-shadow:0 0 26px rgba(248,113,113,.35)}
+.gsicon{width:64px;height:64px;border-radius:18px;margin:0 auto 8px;background:linear-gradient(135deg,#1b212c,#242b38);display:grid;place-items:center;font-size:26px;font-weight:800;color:var(--accent)}
+.gsname{font-weight:800;font-size:15px}
+.gsmeta{color:var(--mut);font-size:11px;margin:2px 0 10px}
+.gsstart{width:100%;border:0;border-radius:12px;padding:11px;font:800 13px/1 system-ui;color:#2a0606;background:linear-gradient(135deg,#f87171,#fbbf24);cursor:pointer}
+.gsrow{display:flex;gap:8px;margin-top:8px}
+.gsrow button,.gsrow select{flex:1;background:var(--card2);border:1px solid var(--line);color:var(--text);border-radius:10px;padding:8px;font:600 11px/1.1 system-ui;cursor:pointer}
+.gsdots{display:flex;gap:6px;justify-content:center;margin-top:10px}
+.gsdots i{width:7px;height:7px;border-radius:50%;background:var(--card2);border:1px solid var(--line)}
+.gsdots i.on{background:#f87171;border-color:#f87171}
+.appbox{position:absolute;left:10px;right:10px;top:10px;bottom:10px;max-width:480px;margin:0 auto;background:var(--card);border:1px solid var(--line);border-radius:20px;padding:14px;overflow-y:auto}
+.hudbox{position:absolute;left:8px;right:8px;top:8px;bottom:8px;max-width:580px;margin:0 auto;background:rgba(13,14,18,.9);border:1px solid var(--line);border-radius:22px;padding:14px;overflow-y:auto;backdrop-filter:blur(10px)}
+.hudgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.hudring{border-radius:50%;aspect-ratio:1;display:grid;place-items:center;background:conic-gradient(var(--accent) 0deg,var(--card2) 0)}
+.hudring.gpu{background:conic-gradient(var(--g2) 0deg,var(--card2) 0)}
+.ringin{width:86%;aspect-ratio:1;border-radius:50%;background:#0b0e14;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+.ringin b{font-size:20px;font-family:var(--mono)}
+.ringin span{color:var(--mut);font-size:10px}
+.hudcols{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.hudsec{font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:.06em;margin:8px 0 4px;font-weight:700}
+.hudgrid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.hudtg{background:rgba(22,23,29,.8);border:1px solid var(--line);border-radius:12px;padding:10px;color:var(--text);font:600 11px/1.2 system-ui;cursor:pointer;display:flex;flex-direction:column;gap:4px;align-items:center}
+.hudtg.on{border-color:var(--accent);color:var(--accent)}
+.hudbottom{position:sticky;bottom:0;display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:12px;border-top:1px solid var(--line);padding-top:10px;font-size:12px}
+.hudbottom button{background:var(--card2);border:1px solid var(--line);color:var(--text);border-radius:10px;padding:8px 12px;cursor:pointer}
+.ccmodal{position:fixed;inset:0;background:rgba(3,5,8,.72);z-index:40;display:none;backdrop-filter:blur(6px)}
+.ccmodal.open{display:block}
+.ccbox{position:absolute;left:10px;right:10px;top:14px;bottom:14px;max-width:560px;margin:0 auto;background:var(--bg);border:1px solid var(--line);border-radius:20px;padding:16px;overflow-y:auto}
+.cchead{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.cctitle{font-size:17px;font-weight:800;display:flex;align-items:center;gap:8px}
+.ccicon{width:30px;height:30px;border-radius:10px;background:linear-gradient(135deg,#9b8cf0,#7ea6e0);display:grid;place-items:center;font-size:15px}
+.ccclose{background:var(--card2);border:1px solid var(--line);color:var(--text);border-radius:10px;width:34px;height:34px;font-size:15px;cursor:pointer}
+.ccsub{color:var(--mut);font-size:11.5px;margin:6px 0 12px}
+.ccsec{margin-bottom:14px}
+.ccsec>h3{margin:0 0 4px;font-size:13.5px}
+.ccsec>p{margin:0 0 8px;color:var(--mut);font-size:11.5px}
+.ccbar{display:grid;grid-template-columns:110px 1fr 56px;gap:8px;align-items:center;font-size:12px;margin-top:8px}
+.ccbar .bar{height:10px}
+.ccbar b{text-align:right;font-family:var(--mono)}
+.ccrow{display:flex;justify-content:space-between;gap:10px;font-size:12px;padding:7px 0;border-top:1px solid var(--line)}
+.ccrow:first-child{border-top:0}
+.ccrow b{font-family:var(--mono)}
+.gamebtn{position:fixed;right:16px;bottom:84px;width:56px;height:56px;border-radius:50%;background:var(--grad);border:0;color:#0d1220;font-size:22px;z-index:20;box-shadow:0 8px 24px rgba(0,0,0,.4)}
+.gamepanel{position:fixed;left:12px;right:12px;bottom:150px;max-width:540px;margin:0 auto;background:rgba(22,23,29,.96);border:1px solid var(--line);border-radius:18px;padding:14px;z-index:21;display:none;backdrop-filter:blur(16px)}
+.gamepanel.open{display:block}
+.gamepanel h3{margin:0 0 8px;font-size:14px}
+.gamerow{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:12.5px;padding:8px 0;border-top:1px solid var(--line)}
+.hero-card{background:linear-gradient(135deg,#14161f,#101218)}
+.dev-name{font-size:22px;font-weight:800;letter-spacing:.2px}
+.dev-soc{color:var(--accent);font-weight:700;font-size:13px;margin-top:4px}
+.dev-cpu{color:var(--mut);font-size:11.5px;margin-top:2px;font-family:var(--mono);word-break:break-all}
+.ia-line{margin-top:12px;font-size:12.5px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.ia-goal,.ia-next,.ia-after{display:flex;justify-content:space-between;gap:10px;border-top:1px solid var(--line);padding-top:8px;margin-top:8px;font-size:12px}
+.ia-goal .label,.ia-next .label,.ia-after .label{color:var(--mut);flex:0 0 auto}
+.deck-head{padding:6px 4px 12px}
+.deck-title{font-size:20px;font-weight:800}
+.deck-sub{color:var(--mut);font-size:12px;margin-top:2px}
+.az-top{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:16px 2px 8px;position:sticky;top:0;background:linear-gradient(var(--bg) 72%,transparent);z-index:5}
+.az-brand{display:flex;gap:12px;align-items:center;min-width:0}
+.az-avatar{width:48px;height:48px;border-radius:16px;background:var(--grad);display:grid;place-items:center;font-weight:800;color:#0d1220;box-shadow:0 6px 20px rgba(126,166,224,.25);flex:0 0 auto}
+.az-title{font-weight:800;font-size:20px;letter-spacing:-.2px}
+.az-top-right{display:flex;align-items:center;gap:8px;flex:0 0 auto}
+.az-stats{background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:7px 11px;font-size:10.5px;font-weight:700;color:var(--mut);font-family:var(--mono)}
+.az-power{width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:var(--card2);color:var(--mut);font-size:17px;cursor:pointer}
+.az-power.on{background:var(--pill);color:var(--pilltext);border-color:transparent}
+.az-topline{display:flex;justify-content:space-between;font-size:10px;color:var(--mut);padding:0 2px 6px;font-family:var(--mono)}
+.az-banner{position:relative;overflow:hidden;background:linear-gradient(135deg,#3b4a6b,#5e88a4 55%,#3d708d);border-radius:24px;padding:22px 18px 46px;margin-bottom:14px;min-height:150px;display:flex;flex-direction:column;justify-content:flex-end}
+.az-banner::before{content:'';position:absolute;right:-30px;top:-30px;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.22),transparent 70%)}
+.az-banner-text{position:relative;font-size:24px;font-weight:800;letter-spacing:-.2px;color:#fff;text-shadow:0 2px 10px rgba(0,0,0,.35)}
+.az-banner-sub{position:relative;color:rgba(255,255,255,.85);font-size:11.5px;margin-top:2px}
+.az-banner-chip{position:absolute;left:16px;bottom:14px;background:rgba(13,14,18,.72);color:#cbd5e1;border-radius:999px;padding:5px 12px;font-size:11px;font-weight:700;backdrop-filter:blur(6px)}
+.az-duo{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.az-tile{border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:4px;border:1px solid var(--line)}
+.az-tile-profile{background:linear-gradient(135deg,#2b3550,#1d2334)}
+.az-tile-root{background:linear-gradient(135deg,#14521b,#0f3a14)}
+.az-tile-ico{font-size:22px}
+.az-tile-title{font-weight:800;font-size:14px}
+.az-tile-sub{color:var(--mut);font-size:11.5px}
+.az-section{margin-bottom:14px}
+.az-section-head{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:700;padding:4px 2px 10px}
+.az-info{width:22px;height:22px;border-radius:50%;background:var(--card2);border:1px solid var(--line);display:grid;place-items:center;font-size:11px;color:var(--mut)}
+.az-chevron{margin-left:auto;color:var(--mut)}
+.az-grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.az-cell{background:var(--card2);border:1px solid var(--line);border-radius:14px;padding:10px}
+.az-k{font-size:10px;color:var(--mut);text-transform:uppercase;letter-spacing:.4px}
+.az-v{font-size:13px;font-weight:600;margin-top:4px;font-family:var(--mono)}
+.az-support{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;font-size:13px;font-weight:600}
+.az-heart{color:#f87171}
+.az-ext{margin-left:auto;color:var(--mut)}
+.az-page-head{padding:6px 4px 12px}
+.az-page-title{font-size:20px;font-weight:800}
+.az-page-sub{color:var(--mut);font-size:12px;margin-top:2px}
+.az-nav{position:fixed;left:10px;right:10px;bottom:10px;max-width:560px;margin:0 auto;height:66px;display:grid;grid-template-columns:repeat(4,1fr);border-radius:24px;background:rgba(22,23,29,.92);backdrop-filter:blur(16px);border:1px solid var(--line);z-index:10;padding:6px}
+.tabbtn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:var(--mut);font-size:10.5px;font-weight:700;border:0;background:transparent;border-radius:18px;padding:0;cursor:pointer}
+.tabbtn span{display:none}
+.tabbtn.on{background:var(--pill);color:var(--pilltext)}
+.tabbtn.on span{display:inline}
+.tabbtn svg{width:22px;height:22px}
+.tab{display:none}
+.tab.active{display:block}
+/* --- Pantalla de configuracion por app (estilo AZenith) --- */
+.appbox{position:absolute;inset:0;left:0;right:0;top:0;bottom:0;max-width:none;margin:0;background:var(--bg);border-radius:0;padding:14px 16px 90px}
+.ap-head{display:flex;align-items:center;gap:10px;position:sticky;top:0;background:var(--bg);padding:6px 0 10px}
+.ap-back{width:38px;height:38px;border-radius:12px;border:1px solid var(--line);background:var(--card2);color:var(--text);font-size:17px;cursor:pointer}
+.ap-title{font-size:16px;font-weight:700;flex:1}
+.ap-ic{width:36px;height:36px;border-radius:12px;border:1px solid var(--line);background:var(--card2);color:var(--mut);font-size:15px;cursor:pointer}
+.ap-note{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:10px 12px;color:var(--mut);font-size:11.5px;display:flex;gap:8px;margin-bottom:12px}
+.ap-note::before{content:'i';flex:0 0 auto;width:18px;height:18px;border-radius:50%;background:var(--accent);color:#0d1220;display:grid;place-items:center;font-size:11px;font-weight:800}
+.ap-id{display:flex;gap:12px;align-items:center;padding:10px 2px 14px}
+.ap-idmeta{flex:1;min-width:0}
+.ap-name{font-size:18px;font-weight:800}
+.ap-pkg{color:var(--mut);font-size:11.5px;font-family:var(--mono);word-break:break-all}
+.ap-sec{font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);margin:14px 2px 6px}
+.ap-row{display:flex;align-items:center;gap:12px;width:100%;background:var(--card2);border:1px solid var(--line);border-radius:14px;padding:13px 14px;margin-bottom:8px;color:var(--text);font:inherit;text-align:left;cursor:pointer}
+.ap-row:active{transform:translateY(1px)}
+.ap-row-ic{width:26px;text-align:center;font-size:14px;flex:0 0 auto}
+.ap-row-txt{flex:1;font-size:13.5px}
+.ap-val{color:var(--accent);font-size:13px;font-weight:600}
+.ap-pill{color:var(--accent);font-size:12px;font-weight:700;background:rgba(126,166,224,.12);border:1px solid rgba(126,166,224,.35);border-radius:999px;padding:5px 10px}
+.choosebox{position:absolute;left:10px;right:10px;bottom:10px;max-width:540px;margin:0 auto;background:var(--card);border:1px solid var(--line);border-radius:20px;padding:14px;max-height:70vh;overflow-y:auto}
+.choose-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.choose-title{font-size:15px;font-weight:800}
+.choose-list{display:flex;flex-direction:column}
+.choose-opt{display:flex;align-items:center;gap:10px;width:100%;background:transparent;border:0;border-top:1px solid var(--line);color:var(--text);padding:13px 6px;font:600 13.5px/1.2 system-ui;text-align:left;cursor:pointer}
+.choose-opt:first-child{border-top:0}
+.choose-opt.on{color:var(--accent)}
+.choose-opt .tick{margin-left:auto;color:var(--accent);font-weight:800}
+/* --- Lista vertical de apps (estilo AZenith) --- */
+.applist{display:flex;flex-direction:column;gap:8px;max-height:none;overflow:visible}
+.approw{display:flex;align-items:center;gap:12px;border:1px solid var(--line);background:var(--card2);border-radius:16px;padding:11px 13px;cursor:pointer;text-align:left;width:100%;color:var(--text);font:inherit}
+.approw:hover{border-color:var(--accent)}
+.approw .gsicon.sm{width:44px;height:44px;border-radius:13px;font-size:18px}
+.appicon{position:relative;overflow:hidden;flex:0 0 auto}
+.appicon img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:inherit}
+.apid{position:relative;overflow:hidden;flex:0 0 auto}
+.apid img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:inherit}
+.apstatus{margin-left:auto;display:flex;align-items:center;gap:8px;flex:0 0 auto}
+.apstatus .ap-chev{color:var(--mut);font-size:16px}
+</style>
+</head>
+<body>
+<main>
+<section class="tab active" id="tab-inicio">
+    <div class="az-top">
+      <div class="az-brand">
+        <div class="az-avatar">IA</div>
+        <div class="az-title">IA Optimizer</div>
+      </div>
+      <div class="az-top-right">
+        <div class="az-stats" id="azStats">— · —</div>
+        <button class="az-power" id="aiSwTop" title="IA Motor">⏻</button>
+      </div>
+    </div>
+    <div class="az-topline"><span id="transport">conectando…</span><span id="daemonText">DAEMON</span></div>
+
+    <div class="az-banner">
+      <div class="az-banner-text">Omega</div>
+      <div class="az-banner-chip" id="bannerState">Suspendido</div>
+    </div>
+
+    <div class="az-duo">
+      <div class="az-tile az-tile-profile">
+        <div class="az-tile-ico">📦</div>
+        <div class="az-tile-title">Perfil actual</div>
+        <div class="az-tile-sub" id="homeProfile">Modo equilibrado</div>
+      </div>
+      <div class="az-tile az-tile-root">
+        <div class="az-tile-ico">🛡</div>
+        <div class="az-tile-title">Permisos Root</div>
+        <div class="az-tile-sub" id="homeRoot">Obtenido</div>
+      </div>
+    </div>
+
+    <div class="az-section">
+      <div class="az-section-head"><span class="az-info">i</span><span>Información del dispositivo</span><span class="az-chevron">▾</span></div>
+      <div class="az-grid2">
+        <div class="az-cell"><div class="az-k">Versión del kernel</div><div class="az-v" id="azKernel">—</div></div>
+        <div class="az-cell"><div class="az-k">Nombre del dispositivo</div><div class="az-v" id="azDevice">—</div></div>
+        <div class="az-cell"><div class="az-k">Plataforma del chipset</div><div class="az-v" id="azChip">—</div></div>
+        <div class="az-cell"><div class="az-k">Versión de IA Optimizer</div><div class="az-v">v0.8.9</div></div>
+      </div>
+    </div>
+
+    <div class="az-support"><span class="az-heart">❤</span><span>Apóyanos</span><span class="az-ext">↗</span></div>
+
+    <div class="card hero-card">
+      <div class="dev-name" id="devName">—</div>
+      <div class="dev-soc" id="devSoc">—</div>
+      <div class="dev-cpu" id="devCpu">—</div>
+      <div class="hint" id="devAdapt" style="margin-top:6px">Adaptando el modulo al dispositivo…</div>
+      <div class="ia-line"><span class="chip sm" id="iaActState">—</span><span id="iaAct">—</span></div>
+      <div class="ia-goal"><span class="label">Objetivo</span><span id="iaGoal">—</span></div>
+      <div class="ia-next"><span class="label">Siguiente</span><span id="iaNextStep">—</span></div>
+      <div class="ia-after"><span class="label">Al completar</span><span id="iaAfter">—</span></div>
+    </div>
+    <div class="card">
+      <div class="hero-top">
+        <div>
+          <div class="label">Temperatura</div>
+          <div class="temp"><span id="temp">–</span><span class="unit">°C</span></div>
+          <div class="chip sm" id="tempState">—</div>
+        </div>
+        <div class="hero-right">
+          <div class="label">Motor sugiere</div>
+          <div class="big" id="sugProfile">–</div>
+          <div class="confbar"><i id="confFill"></i></div>
+        </div>
+      </div>
+      <div class="profiles" id="profileBtns">
+        <button data-p="performance">Rendimiento</button>
+        <button data-p="balanced">Balanceado</button>
+        <button data-p="eco">ECO</button>
+      </div>
+      <div class="hint" id="profileLockHint" style="display:none;margin:0 0 10px">Modo automático activo: IA Motors decide el perfil. Desactívalo para elegir manualmente.</div>
+      <div class="rowopts">
+        <label class="switchrow"><span>Modo automático</span><span class="switch" id="autoSw"></span></label>
+        <label class="switchrow"><span>Simular juego</span><span class="switch" id="gameSw"></span></label>
+      </div>
+      <canvas id="chart"></canvas>
+      <div class="legend"><span><i class="k cpu"></i>CPU %</span><span><i class="k temp"></i>Temperatura</span></div>
+    </div>
+
+    <div class="stats">
+      <div class="stat card"><div class="label">Carga CPU</div><div class="value" id="stCpu">–</div><div class="hint">Uso medio del procesador.</div></div>
+      <div class="stat card"><div class="label">Gobernador</div><div class="value sm" id="stGov">—</div><div class="hint">Estrategia de ahorro o rendimiento.</div></div>
+      <div class="stat card"><div class="label">Freq máx</div><div class="value sm" id="stFreq">—</div><div class="hint">Límite de velocidad actual.</div></div>
+      <div class="stat card"><div class="label">Batería</div><div class="value sm" id="stBat">–</div><div class="hint">Nivel y estado de carga.</div></div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><h2>CPU</h2><span class="chip sm" id="cpuNow">—</span></div>
+      <div class="freqbar">
+        <div class="freq"><span class="label">Mín</span><b id="cpuMin">—</b></div>
+        <div class="freq cur"><span class="label">Actual</span><b id="cpuCur">—</b></div>
+        <div class="freq"><span class="label">Máx</span><b id="cpuMax">—</b></div>
+      </div>
+      <canvas id="chartCpu"></canvas>
+      <div class="legend"><span><i class="k cpu"></i>CPU %</span><span><i class="k temp"></i>Temperatura</span></div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><h2>Lecturas en vivo</h2></div>
+      <div class="livegrid">
+        <div class="live"><span class="label">Voltaje</span><b id="lvVolt">—</b></div>
+        <div class="live"><span class="label">Núcleos en línea</span><b id="lvCores">—</b></div>
+        <div class="live"><span class="label">Presión memoria</span><b id="lvPsi">—</b></div>
+        <div class="live"><span class="label">Descarga</span><b id="lvDown">—</b></div>
+        <div class="live"><span class="label">Subida</span><b id="lvUp">—</b></div>
+        <div class="live"><span class="label">Refresco</span><b id="lvHz">—</b></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><h2>Memoria Trix</h2><span class="chip sm" id="mtrixState">—</span></div>
+      <div class="memrow"><span class="label">RAM</span><div class="bar"><i id="barRam"></i></div><b id="txtRam">—</b></div>
+      <div class="memrow"><span class="label">ZRAM</span><div class="bar"><i id="barZram"></i></div><b id="txtZram">—</b></div>
+      <div class="memrow"><span class="label">Almacenamiento</span><div class="bar"><i id="barDisk"></i></div><b id="txtDisk">—</b></div>
+      <div class="hint">Usado / total.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><h2>Actividad del motor</h2><span class="chip sm" id="knobCount">–</span></div>
+      <div class="reason" id="reason">–</div>
+      <div class="log" id="log"></div>
+    </div>
+  </section>
+<section class="tab" id="tab-apps"><div class="az-page-head"><div class="az-page-title">Lista de aplicaciones</div><div class="az-page-sub">Aplicaciones y Game Space</div></div>
+<div id="set-juegos">
+      <div class="gsstatus">
+        <span><i class="dot"></i> Root</span>
+        <span id="gsBat">Batería —</span>
+        <span id="gsTemp">— °C</span>
+        <span id="gsRam">RAM — GB</span>
+      </div>
+      <div class="tabs" id="gsTabs">
+        <button class="tbtn on" data-gs="apps">Apps</button>
+        <button class="tbtn" data-gs="games">Game Space</button>
+        <button class="tbtn" data-gs="control">Perfiles</button>
+      </div>
+
+      <div class="mtpane" id="gs-apps" style="display:block">
+        <input type="search" id="appSearch" placeholder="Buscar aplicación…" class="search">
+        <div class="modes" id="appFilters" style="margin:10px 0">
+          <button class="modebtn on" data-af="all">Todas</button>
+          <button class="modebtn" data-af="user">Usuario</button>
+          <button class="modebtn" data-af="system">Sistema</button>
+          <button class="modebtn" data-af="games">Juegos</button>
+        </div>
+        <div id="appList" class="applist"><div class="empty">Cargando aplicaciones…</div></div>
+        <button class="action" id="btnOpenGs" style="margin-top:12px">Abrir Game Space</button>
+      </div>
+
+      <div class="mtpane" id="gs-games" style="display:none">
+        <div class="hint" style="margin-bottom:8px">Solo aplicaciones marcadas como juego (por categoría o con el interruptor de su panel).</div>
+        <div class="gscarousel" id="gsCarousel"><div class="empty">Cargando juegos…</div></div>
+        <div class="gsdots" id="gsDots"></div>
+        <div class="hint" style="text-align:center;margin-top:8px">Desliza para ver más juegos · desliza hacia arriba para el Centro de control</div>
+        <button class="action" id="btnHud" style="margin-top:10px">Abrir panel lateral (HUD)</button>
+      </div>
+
+      <div class="mtpane" id="gs-control" style="display:none">
+        <div class="card"><div class="card-head"><h2>Perfiles por juego</h2></div><div id="gsProfiles"><div class="empty">Sin juegos marcados.</div></div></div>
+        <div class="card"><div class="card-head"><h2>Acciones rápidas</h2></div><div class="hudgrid2" id="gsQuick"></div></div>
+      </div>
+    </div>
+
+    </section>
+<section class="tab" id="tab-tweaks">
+    <div class="deck-head">
+      <div class="deck-title">IA Motors</div>
+      <div class="deck-sub" id="motorsSub">Monitoreo — sin intervencion ni bucles activos</div>
+    </div>
+
+    <div class="card">
+      <div class="dec"><span>Encendido</span><span class="switch" id="aiSw"></span></div>
+      <div class="hint">Decide, escribe a traves del arbitro y mide el resultado.</div>
+      <button class="action" id="btnAiRun">Ejecute un ciclo ahora</button>
+      <button class="action" id="btnOpenCC" style="margin-top:10px">Abra el centro de comando en vivo</button>
+      <div class="dec" style="margin-top:12px"><span>Satisfaccion objetiva</span><b id="mtSat">—</b></div>
+      <div class="confbar"><i id="mtSatBar"></i></div>
+      <div class="hint" id="mtObjective">—</div>
+      <div class="dec" style="margin-top:8px"><span>Actividad</span><b id="agActivity">—</b></div>
+      <div class="hint" id="agPhase">—</div>
+    </div>
+
+    <div class="tabs" id="mtTabs">
+      <button class="tbtn on" data-mt="desc">Resumen</button>
+      <button class="tbtn" data-mt="tweaks">Tweaks</button>
+      <button class="tbtn" data-mt="diario">Diario</button>
+      <button class="tbtn" data-mt="aprend">Aprendizaje</button>
+      <button class="tbtn" data-mt="energia">Energía</button>
+      <button class="tbtn" data-mt="sistema">Sistema</button>
+    </div>
+
+    <div class="mtpane" id="mt-desc" style="display:block">
+      <div class="card">
+        <div class="card-head"><h2>Rendimiento en vivo</h2></div>
+        <canvas id="mtChart"></canvas>
+        <div class="legend"><span><i class="k cpu"></i>CPU %</span><span><i class="k temp"></i>Temperatura</span></div>
+      </div>
+      <div class="stats">
+        <div class="stat card"><div class="label">Carga de CPU</div><div class="value" id="mtCpu">–</div></div>
+        <div class="stat card"><div class="label">Temperatura</div><div class="value" id="mtTemp">–</div></div>
+        <div class="stat card"><div class="label">Batería</div><div class="value" id="mtBat">–</div></div>
+        <div class="stat card"><div class="label">Memoria RAM</div><div class="value" id="mtRam">–</div></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h2>Contexto</h2></div>
+        <div class="dec"><span>App en primer plano</span><b id="mtApp">—</b></div>
+        <div class="dec"><span>Estado de pantalla</span><b id="mtScreen">—</b></div>
+        <div class="dec"><span>Perfil base</span><b id="mtProfile">—</b></div>
+        <div class="dec"><span>Preset de sistema</span><b>IA Motors</b></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h2>Distribucion de objetivos</h2></div>
+        <div class="memrow"><span class="label">Actuacion</span><div class="bar"><i id="obAct"></i></div><b id="obActT">—</b></div>
+        <div class="memrow"><span class="label">Batería</span><div class="bar"><i id="obBat"></i></div><b id="obBatT">—</b></div>
+        <div class="memrow"><span class="label">Espacio termico</span><div class="bar"><i id="obEsp"></i></div><b id="obEspT">—</b></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h2>Seguridad termica</h2></div>
+        <div class="dec"><span>Gobernador</span><b id="thGov">—</b></div>
+        <div class="dec"><span>Intervenciones medidas</span><b id="thInt">—</b></div>
+        <div class="dec"><span>Temperatura SoC maxima</span><b id="thSoc">—</b></div>
+        <div class="dec"><span>Temperatura de batería</span><b id="thBat">—</b></div>
+      </div>
+    </div>
+
+    <div class="mtpane" id="mt-tweaks">
+      <div id="ctrlHome">
+        <div class="group-title">Secciones de ajuste</div>
+        <div class="grid2" id="grpSections"></div>
+      </div>
+      <div id="ctrlDetail" style="display:none">
+        <button class="action" id="btnBackCtrl">← Volver a Tweaks</button>
+        <div class="card">
+          <div class="card-head"><h2 id="detTitle">—</h2></div>
+          <div class="reason" id="detDesc">—</div>
+          <div id="detInfo"></div>
+          <div id="detBody" style="margin-top:10px"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mtpane" id="mt-diario">
+      <div class="card">
+        <div class="card-head"><h2>Diario de decision</h2><span class="chip sm" id="djCount">0</span></div>
+        <input type="search" id="djSearch" placeholder="Buscar por app, veredicto o detalle…" style="width:100%;margin:8px 0;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--card2);color:var(--txt)">
+        <div class="modes" id="djFilters">
+          <button class="modebtn on" data-f="todo">Todo</button>
+          <button class="modebtn" data-f="decisiones">Decisiones</button>
+          <button class="modebtn" data-f="sondas">Sondas</button>
+          <button class="modebtn" data-f="alertas">Alertas</button>
+        </div>
+        <div class="decisions" id="djList" style="margin-top:10px"><div class="empty">Sin entradas.</div></div>
+      </div>
+    </div>
+
+    <div class="mtpane" id="mt-aprend">
+      <div class="card">
+        <div class="card-head"><h2>Honestidad del motor</h2></div>
+        <div class="dec"><span>Predicciones medibles</span><b id="lrHonesty">—</b></div>
+        <div class="hint" id="lrHonestyHint">—</div>
+        <div class="dec"><span>Acciones verificadas</span><b id="lrVerified">—</b></div>
+        <div class="dec"><span>Con medición real</span><b id="lrMeasured">—</b></div>
+        <div class="dec"><span>Anulaciones del usuario</span><b id="lrOverrides">—</b></div>
+        <div class="dec"><span>Ventana de datos</span><b id="lrWindow">—</b></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h2>Efecto medido por control</h2><span class="chip sm" id="lrWeightsCount">0</span></div>
+        <div class="hint">Delta de temperatura (°C) de acciones verificadas, por modo y tipo de control. Negativo = enfrió; positivo = calentó.</div>
+        <div id="lrWeights"><div class="empty">Aún sin datos: hacen falta acciones verificadas.</div></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h2>Aprendizaje por app</h2></div>
+        <div class="hint">Acciones verificadas mientras cada app estaba en primer plano.</div>
+        <div id="lrPerApp"><div class="empty">Sin acciones por app todavía.</div></div>
+      </div>
+    </div>
+    <div class="mtpane" id="mt-energia">
+      <div class="card">
+        <div class="card-head"><h2>Batería</h2></div>
+        <div class="kv"><span>Nivel</span><b id="enBat">—</b></div>
+        <div class="kv"><span>Temperatura</span><b id="enTemp">—</b></div>
+        <div class="kv"><span>Estado</span><b id="enState">—</b></div>
+        <div class="kv"><span>Voltaje</span><b id="enVolt">—</b></div>
+        <div class="kv"><span>Ahorro de batería</span><b id="enSaver">—</b></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h2>Bypass de carga</h2><span class="chip sm" id="bpState">—</span></div>
+        <div class="dec"><span>Cargador conectado</span><b id="bpCharger">—</b></div>
+        <div class="dec"><span>Batería</span><b id="bpBat">—</b></div>
+        <div class="dec"><span>Umbral</span><b id="bpThr">—</b></div>
+        <div class="dec"><span>Nodo en uso</span><b id="bpNode">—</b></div>
+        <label class="switchrow" style="margin-top:10px"><span>Bypass activo</span><span class="switch" id="bpSw"></span></label>
+        <div class="hint" id="bpMsg" style="font-size:11px">El interruptor aplica o quita el bypass en el nodo elegido.</div>
+        <div class="label" style="margin-top:10px">Umbral de batería (recomendado 50–80%)</div>
+        <div class="modes" id="bpThrBtns"></div>
+        <input type="range" id="bpThrRange" min="30" max="100" step="5" value="80" style="width:100%;margin-top:10px">
+        <button class="action" id="bpCheck">Comprobar nodos</button>
+        <button class="action" id="bpDiag">Diagnóstico de compatibilidad</button>
+        <div class="decisions" id="bpNodes" style="margin-top:10px"></div>
+        <div class="hint" style="margin-top:8px">El diagnóstico escribe y restaura cada nodo para indicar cuál funciona. El bypass deja que el cargador alimente el sistema sin cargar la batería; solo se activa con cargador conectado y por encima del umbral.</div>
+      </div>
+    </div>
+    <div class="mtpane" id="mt-sistema">
+      <div class="card">
+        <div class="card-head"><h2>Dispositivo</h2></div>
+        <div class="kv"><span>Dispositivo</span><b id="pfDev">—</b></div>
+        <div class="kv"><span>SoC</span><b id="pfSoc">—</b></div>
+        <div class="kv"><span>GPU</span><b id="pfGpu">—</b></div>
+        <div class="kv"><span>Capacidades</span><b id="pfFeat">—</b></div>
+        <div class="kv"><span>Transporte</span><b id="setTransport">–</b></div>
+        <div class="kv"><span>PID</span><b id="setPid">–</b></div>
+        <div class="kv"><span>Tiempo activo</span><b id="setUptime">–</b></div>
+        <div class="kv"><span>Controles</span><b id="setKnobs">–</b></div>
+        <div class="kv"><span>Versión</span><b id="setVersion">–</b></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h2>Diagnóstico del módulo</h2><span class="chip sm" id="repOk">—</span></div>
+        <div class="decisions" id="repList"><div class="empty">Sin diagnóstico.</div></div>
+        <button class="action" id="btnRepair" style="margin-top:10px">Reparar automáticamente</button>
+      </div>
+    </div>
+  </section>
+<section class="tab" id="tab-ajustes">
+    <div class="deck-head">
+      <div class="deck-title">Ajustes</div>
+      <div class="deck-sub">Pantalla, registro y acerca de</div>
+    </div>
+
+    <div class="tabs" id="setTabs">
+      <button class="tbtn on" data-set="pantalla">Pantalla</button>
+      <button class="tbtn" data-set="registro">Registro</button>
+      <button class="tbtn" data-set="acerca">Acerca de</button>
+    </div>
+
+    <div class="mtpane" id="set-pantalla" style="display:block">
+      <div class="card">
+        <div class="card-head"><h2>Pantalla</h2></div>
+        <div class="dec"><span>Refresco actual</span><b id="dpHz">—</b></div>
+        <div class="label" style="margin-top:10px">Tasa de refresco</div>
+        <div class="modes" id="dpHzBtns" style="margin-top:8px"></div>
+        <div class="dec" style="margin-top:10px"><span>Motor de renderizado</span><b id="rdCur">—</b></div>
+        <div class="modes" id="rdBtns" style="margin-top:10px"></div>
+        <div class="dec" style="margin-top:10px"><span>Densidad</span><b id="dpDen">—</b></div>
+        <div class="dec" style="margin-top:6px"><span>Tamaño de pantalla</span><b id="dpSize">—</b></div>
+        <div class="hint" style="margin-top:8px">El motor de renderizado puede pedir reiniciar las apps o el sistema.</div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h2>Audio</h2></div>
+        <div id="audioProps"><div class="empty">Cargando propiedades…</div></div>
+      </div>
+    </div>
+
+    <div class="mtpane" id="set-registro">
+      <div class="card">
+        <div class="card-head"><h2>Herramientas</h2></div>
+        <button class="action" id="btnSelftest">Ejecutar autocomprobación</button>
+        <button class="action" id="btnScan">Reescanear controles</button>
+        <div class="log" id="toolLog"></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h2>Errores que IA Motors no pudo solucionar</h2><span class="chip sm" id="unresCount">0</span></div>
+        <div class="decisions" id="unresList"><div class="empty">Sin errores pendientes.</div></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h2>Diario de decisión</h2></div>
+        <div class="hint">Las decisiones, sondas y alertas del motor, con filtros y búsqueda.</div>
+        <button class="action" id="btnOpenDiario" style="margin-top:10px">Abrir el diario en IA Motor</button>
+      </div>
+    </div>
+
+    <div class="mtpane" id="set-acerca">
+      <div class="card about">
+        <div class="card-head"><h2>Acerca de</h2></div>
+        <p>IA Optimizer v0.8.7.7 · by <b>TeyZen</b>.</p>
+        <p>Módulo systemless escrito en Rust, sin dependencias. WebUI local; los ajustes se verifican y se revierten si no se sostienen.</p>
+      </div>
+      <div class="card about">
+        <div class="card-head"><h2>Licencias</h2></div>
+        <p>Interfaz y secciones inspiradas en <b>AZenith</b> (Apache License, Version 2.0), Copyright (C) 2025-2026 Zexshia · ArchHaven Developers. AZenith incorpora Encore Tweaks, Rianixia-ThermalCore, VMTouch y KTweak.</p>
+        <p>Este módulo es código propio: no se incluye código, recursos binarios ni datos de AZenith.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+
+<div class="ccmodal" id="ccModal">
+  <div class="ccbox">
+    <div class="cchead">
+      <div class="cctitle"><span class="ccicon">🧠</span> Centro de comando en vivo</div>
+      <button class="ccclose" id="ccClose">✕</button>
+    </div>
+    <div class="ccsub"><span id="ccPolicy">policy0</span> · <span class="dot" style="display:inline-block"></span> Vivir · En este momento · Decisiones automáticas habilitadas</div>
+
+    <div class="ccsec">
+      <h3>Vitales vivos</h3>
+      <p>Las barras pasan de la lectura anterior a la nueva; aquí no se estima nada.</p>
+      <div class="ccbar"><span>Carga de CPU</span><div class="bar"><i id="ccCpu"></i></div><b id="ccCpuT">—</b></div>
+      <div class="ccbar"><span>Batería</span><div class="bar"><i id="ccBat"></i></div><b id="ccBatT">—</b></div>
+      <div class="ccbar"><span>Memoria en uso</span><div class="bar"><i id="ccRam"></i></div><b id="ccRamT">—</b></div>
+      <div class="ccbar"><span>Temperatura</span><div class="bar"><i id="ccTemp"></i></div><b id="ccTempT">—</b></div>
+      <canvas id="ccTrend" style="width:100%;height:54px;margin-top:8px"></canvas>
+    </div>
+
+    <div class="ccsec">
+      <h3>Previsión térmica vs real</h3>
+      <p>La previsión anticipada que el motor ya calcula para la seguridad, frente a lo que realmente ocurrió. La brecha es el error.</p>
+      <canvas id="ccTherm" style="width:100%;height:96px"></canvas>
+    </div>
+
+    <div class="ccsec">
+      <h3>Error de predicción a largo plazo</h3>
+      <p>Brecha absoluta entre la ganancia prevista y la medida. Un punto por bucle.</p>
+      <canvas id="ccErr" style="width:100%;height:80px"></canvas>
+      <div class="ccrow"><span id="ccErrTag" class="badge warn">Aún no cayendo</span><b id="ccErrSum">—</b></div>
+    </div>
+
+    <div class="ccsec">
+      <h3>Lo que sabe y lo que no</h3>
+      <p>Estado de conocimiento por perilla disponible. Lo desconocido es lo primero porque es la razón por la que existe la exploración.</p>
+      <div class="ccbar"><span>Incierto</span><div class="bar"><i id="ccInc" style="background:linear-gradient(90deg,#f59e0b,#fbbf24)"></i></div><b id="ccIncT">—</b></div>
+      <div class="ccbar"><span>Útil conocido</span><div class="bar"><i id="ccUtil" style="background:linear-gradient(90deg,#34d399,#22d3ee)"></i></div><b id="ccUtilT">—</b></div>
+      <div id="ccKnow" style="margin-top:8px"></div>
+    </div>
+
+    <div class="ccsec">
+      <h3>Puerta de exploración</h3>
+      <p>Sólo prueba lo que no sabe, y sólo mientras un error le saldría barato. Cada rechazo tiene un nombre.</p>
+      <div class="ccrow"><span>🧪 <span id="ccGate">—</span></span><b id="ccProbes">—</b></div>
+      <h3 style="margin-top:12px">Plan de control inteligente</h3>
+      <p>Qué puede hacer la automatización ahora, por qué y cómo puede revertirse.</p>
+      <div class="ccrow"><span>Modo</span><b>Adaptive</b></div>
+      <div class="ccrow"><span>Cobertura de aprendizaje</span><b id="ccCover">—</b></div>
+      <div class="ccrow"><span>Comportamiento del perfil</span><b>Context-aware user</b></div>
+      <div class="ccrow"><span>Siguiente acción</span><b id="ccNext">—</b></div>
+      <div class="ccrow"><span>Seguridad</span><span class="badge">Reversible</span></div>
+    </div>
+
+    <div class="ccsec">
+      <h3>Bucles que realmente ejecutó</h3>
+      <p>Contado por tipo. La seguridad, la deriva y sus anulaciones se mantienen fuera de la tasa de éxito.</p>
+      <div class="ccrow"><span>Mejorado y mantenido</span><b id="ccMejorado">0</b></div>
+      <div class="ccrow"><span>Regresó y retrocedió</span><b id="ccRegresado">0</b></div>
+      <div class="ccrow"><span>Intervenciones de seguridad</span><b id="ccSeguridad">0</b></div>
+      <div class="ccrow"><span>Se detectó desviación de la perilla</span><b id="ccDesviacion">0</b></div>
+      <div class="ccrow"><span>Lo anulaste</span><b id="ccAnulaciones">0</b></div>
+      <div class="ccrow"><span>Se miden los veredictos diferidos</span><b id="ccVeredictos">0</b></div>
+      <div class="ccrow"><span>Sondas de conocimiento</span><b id="ccSondas">0</b></div>
+    </div>
+
+    <div class="ccsec">
+      <h3>¿A quién pertenece cada control?</h3>
+      <p>Un ganador por perilla de hardware, del diario de propiedad compartida.</p>
+      <div id="ccOwners"></div>
+      <button class="action" id="btnEvaluate" style="margin-top:10px">Evaluación del dispositivo</button>
+      <div id="ccEval" style="margin-top:8px"></div>
+    </div>
+  </div>
+</div>
+<div class="ccmodal" id="hudModal">
+  <div class="hudbox">
+    <div class="hudgrid">
+      <div class="hudring" id="ringCpu"><div class="ringin"><b id="hudCpuGhz">0.00</b><span>CPU GHz</span></div></div>
+      <div class="hudring gpu" id="ringGpu"><div class="ringin"><b id="hudGpuMhz">0</b><span>GPU MHz</span></div></div>
+    </div>
+    <div class="hudcols">
+      <div>
+        <div class="hudsec">Perfil térmico</div>
+        <div class="modes" id="hudThermal">
+          <button class="modebtn on" data-hudprof="balanced">Predeterminado</button>
+          <button class="modebtn" data-hudprof="performance">Sin anulación</button>
+        </div>
+        <div class="hudsec">Fuerza y priorización de E/S</div>
+        <div class="modes" id="hudIo">
+          <button class="modebtn" data-hudprof="balanced">Equilibrado</button>
+          <button class="modebtn" data-hudprof="performance">Rendimiento</button>
+          <button class="modebtn" data-hudprof="eco">Ahorro</button>
+        </div>
+      </div>
+      <div>
+        <div class="hudsec">Utilidades rápidas</div>
+        <div class="hudgrid2">
+          <button class="hudtg" data-quick="wifi_on" data-active="wifi_off">📶 Wifi</button>
+          <button class="hudtg" data-quick="data_on" data-active="data_off">📱 Datos</button>
+          <button class="hudtg" data-quick="hz" data-value="120">🔁 120 Hz</button>
+          <button class="hudtg" data-quick="dnd_on" data-active="dnd_off">🔕 No molestar</button>
+          <button class="hudtg" data-quick="info">ℹ️ Sistema</button>
+          <button class="hudtg" data-quick="log">🧾 Registro</button>
+          <button class="hudtg" data-quick="fps">📊 FPS en vivo</button>
+          <button class="hudtg" data-quick="crosshair">🎯 Crosshair</button>
+        </div>
+      </div>
+    </div>
+    <div class="hudbottom"><span id="hudGame">—</span><span id="hudBat">—</span><button id="hudClose">Cerrar</button></div>
+  </div>
+</div>
+<div class="ccmodal" id="appModal">
+  <div class="appbox">
+    <div class="ap-head">
+      <button class="ap-back" id="apClose" title="Volver">←</button>
+      <div class="ap-title">Configuración de la aplicación</div>
+      <button class="ap-ic" id="apShare" title="Compartir">↗</button>
+      <button class="ap-ic" id="apInfo" title="Información">ⓘ</button>
+    </div>
+    <div class="ap-note">La configuración específica de la aplicación anula la configuración global.</div>
+    <div class="ap-id">
+      <div class="gsicon apid" id="apIcon"><span id="apIconLetter">A</span><img id="apIconImg" alt="" onerror="this.remove()"></div>
+      <div class="ap-idmeta"><div class="ap-name" id="apName">—</div><div class="ap-pkg" id="apPkg">—</div></div>
+    </div>
+    <label class="ap-row"><span class="ap-row-ic">⏻</span><span class="ap-row-txt">Interruptor principal</span><span class="switch" id="apGame"></span></label>
+    <div class="ap-sec">Rendimiento</div>
+    <button class="ap-row" data-choose="perf"><span class="ap-row-ic">⏱</span><span class="ap-row-txt">Modo de rendimiento ligero</span><span class="ap-val" id="apPerf">Predeterminado</span></button>
+    <div class="ap-sec">Configuraciones adicionales</div>
+    <button class="ap-row" data-choose="bypass"><span class="ap-row-ic">🔁</span><span class="ap-row-txt">Carga por bypass</span><span class="ap-val" id="apBypass">Predeterminado</span></button>
+    <button class="ap-row" data-choose="preload"><span class="ap-row-ic">🚀</span><span class="ap-row-txt">Precarga del juego</span><span class="ap-val" id="apPreload">Predeterminado</span></button>
+    <div class="ap-sec">Pantalla y renderizado</div>
+    <button class="ap-row" data-choose="hz"><span class="ap-row-ic">🔁</span><span class="ap-row-txt">Tasa de refresco</span><span class="ap-val" id="apHz">Predeterminado</span></button>
+    <button class="ap-row" data-choose="renderer"><span class="ap-row-ic">🎨</span><span class="ap-row-txt">Motor de renderizado</span><span class="ap-val" id="apRenderer">Predeterminado</span></button>
+    <div class="ap-sec">Configuración de resolución</div>
+    <button class="ap-row" data-choose="resolution"><span class="ap-row-ic">📐</span><span class="ap-row-txt">Reducir resolución</span><span class="ap-pill" id="apRes">Predeterminado</span></button>
+    <button class="ap-row" data-choose="fps"><span class="ap-row-ic">🎬</span><span class="ap-row-txt">Tasa de fotogramas objetivo</span><span class="ap-pill" id="apFps">60 fps</span></button>
+    <div class="ap-note">Al activar la tasa de refresco, el módulo la gestionará para esta aplicación.</div>
+    <button class="action" id="apApply" style="margin-top:12px">Aplicar ajustes ahora</button>
+  </div>
+</div>
+<div class="ccmodal" id="chooseModal">
+  <div class="choosebox">
+    <div class="choose-head"><div class="choose-title" id="chooseTitle">Opción</div><button class="ccclose" id="chooseClose">✕</button></div>
+    <div class="choose-list" id="chooseList"></div>
+  </div>
+</div>
+
+
+<nav class="az-nav">
+  <button class="tabbtn on" data-tab="inicio" title="Inicio"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8v9a2 2 0 0 1-2 2h-4v-6H9v6H5a2 2 0 0 1-2-2z"/></svg><span>Inicio</span></button>
+  <button class="tabbtn" data-tab="apps" title="Aplicaciones"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg><span>Aplicaciones</span></button>
+  <button class="tabbtn" data-tab="tweaks" title="IA Motors"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h16M4 16h16"/><circle cx="9" cy="8" r="2.2"/><circle cx="15" cy="16" r="2.2"/></svg><span>IA Motors</span></button>
+  <button class="tabbtn" data-tab="ajustes" title="Ajustes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M19 12a7 7 0 0 0-.1-1.2l2-1.5-2-3.4-2.3.9a7 7 0 0 0-2-1.2L14 3h-4l-.5 2.6a7 7 0 0 0-2 1.2l-2.3-.9-2 3.4 2 1.5A7 7 0 0 0 5 12c0 .4 0 .8.1 1.2l-2 1.5 2 3.4 2.3-.9a7 7 0 0 0 2 1.2L10 21h4l.5-2.6a7 7 0 0 0 2-1.2l2.3.9 2-3.4-2-1.5c.1-.4.1-.8.1-1.2z"/></svg><span>Ajustes</span></button>
+</nav>
+<script>
+// Trampa de errores: si algo falla al arrancar, se anota en el registro de Ajustes.
+window.addEventListener('error', e => {
+  const el = document.getElementById('toolLog');
+  if (el) { el.textContent += `[err] ${e.message} @${(e.filename||'').split('/').pop()}:${e.lineno}\n`; el.scrollTop = 1e9; }
+});
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const HAS_KSU = !!(window.ksu && typeof ksu.exec === 'function');
+const BIN = '/data/adb/modules/ia_optimizer/bin/iaopt';
+const DAEMON = 'http://127.0.0.1:8080';
+const shq = s => "'" + String(s).replace(/'/g, "'\\''") + "'";
+
+// Un solo punto de entrada para ambos transportes:
+//  - Dentro de KernelSU/MMRL: ksu.exec (root) hacia el binario del modulo.
+//  - En navegador: HTTP al demonio local.
+async function j(url, opt){
+  if (HAS_KSU) {
+    const body = opt && opt.body ? JSON.parse(opt.body) : null;
+    let cmd = null;
+    if (url === '/api/state') cmd = `${BIN} state`;
+    else if (url === '/api/scan') cmd = `${BIN} scan-json`;
+    else if (url === '/api/history') cmd = `${BIN} history`;
+    else if (url === '/api/profile') cmd = `${BIN} apply ${shq(body.profile)}`;
+    else if (url === '/api/auto') cmd = `${BIN} set-auto ${body.enabled ? 1 : 0}`;
+    else if (url === '/api/gaming') cmd = `${BIN} set-gaming ${body.enabled ? 1 : 0}`;
+    else if (url === '/api/knob') cmd = `${BIN} set-knob ${shq(body.path)} ${shq(body.value)}`;
+    else if (url === '/api/ai') cmd = `${BIN} ai`;
+    else if (url === '/api/telemetry') cmd = `${BIN} telemetry`;
+    else if (url === '/api/processes') cmd = `${BIN} processes`;
+    else if (url === '/api/repair' && opt && opt.method === 'POST') cmd = `${BIN} repair-apply ${shq(body.fix)}`;
+    else if (url === '/api/repair') cmd = `${BIN} repair`;
+    else if (url === '/api/bypass') cmd = `${BIN} bypass`;
+    else if (url === '/api/bypass-set') cmd = `${BIN} bypass-set ${shq(body.enable ? 1 : 0)} ${body.path ? shq(body.path) : ''}`;
+    else if (url === '/api/bypass-test') cmd = `${BIN} bypass-test ${shq(body.path)}`;
+    else if (url === '/api/bypass-threshold') cmd = `${BIN} bypass-threshold ${body.value}`;
+    else if (url === '/api/bypass-diagnose') cmd = `${BIN} bypass-diagnose`;
+    else if (url === '/api/device') cmd = `${BIN} device`;
+    else if (url === '/api/agent' && opt && opt.method === 'POST') cmd = `${BIN} agent-retry ${shq(body.path)}`;
+    else if (url === '/api/agent') cmd = `${BIN} agent`;
+    else if (url === '/api/agent-clear') cmd = `${BIN} clear-journal`;
+    else if (url === '/api/command_center') cmd = `${BIN} command-center`;
+    else if (url === '/api/evaluate') cmd = `${BIN} evaluate`;
+    else if (url === '/api/audio') cmd = `${BIN} audio`;
+    else if (url === '/api/display') cmd = `${BIN} display`;
+    else if (url === '/api/games') cmd = `${BIN} games`;
+    else if (url.startsWith('/api/apps')) {
+      const f = (url.split('filter=')[1] || (body && body.filter) || 'all').split('&')[0];
+      cmd = `${BIN} apps ${f}`;
+    }
+    else if (url === '/api/app-settings') cmd = `${BIN} app-settings ${shq(body.package)} ${shq(body.key)} ${shq(body.value)}`;
+    else if (url === '/api/app-apply') cmd = `${BIN} app-apply ${shq(body.package)}`;
+    else if (url.startsWith('/api/app-info')) {
+      const p = decodeURIComponent((url.split('package=')[1] || '').split('&')[0] || '');
+      cmd = `${BIN} app-info ${shq(p)}`;
+    }
+    else if (url === '/api/resolution') cmd = `${BIN} resolution ${shq(body.value)}`;
+    else if (url === '/api/hud') cmd = `${BIN} hud`;
+    else if (url === '/api/launch') cmd = `${BIN} launch ${shq(body.package)}`;
+
+    else if (url === '/api/quick') cmd = `${BIN} quick ${shq(body.action)} ${shq(body.value || '')}`;
+    else if (url === '/api/renderer' && opt && opt.method === 'POST') cmd = `${BIN} renderer ${shq(body.value)}`;
+    else if (url === '/api/renderer') cmd = `${BIN} renderer`;
+    else if (url === '/api/ai/run') cmd = `${BIN} ai-run`;
+    else if (url === '/api/ai/toggle') cmd = `${BIN} ai-toggle ${body.enabled ? 1 : 0}`;
+    else if (url === '/api/features' && opt && opt.method === 'POST') {
+      const b = JSON.parse(opt.body);
+      const k = Object.keys(b)[0];
+      cmd = `${BIN} features-set ${k} ${b[k] ? 1 : 0}`;
+    }
+    else if (url === '/api/features') cmd = `${BIN} features`;
+    if (!cmd) return {};
+    const out = window.ksu.exec(cmd) || '';
+    try { return JSON.parse(out); } catch(e){ return {error: out}; }
+  }
+  const base = location.host.endsWith(':8080') ? '' : DAEMON;
+  const r = await fetch(base + url, opt);
+  return r.json().catch(()=> ({}));
+}
+
+const HIST = [];
+let TELEM = null;
+function log(msg){
+  const el = $('#log');
+  if (!el) return;
+  el.textContent += `[${new Date().toLocaleTimeString()}] ${msg}\n`;
+  el.scrollTop = 1e9;
+}
+function toolLog(msg){
+  const el = $('#toolLog');
+  if (!el) return;
+  el.textContent += msg + "\n";
+  el.scrollTop = 1e9;
+}
+function fmtUptime(s){
+  if (s < 60) return s + 's';
+  if (s < 3600) return Math.floor(s/60) + 'm ' + (s%60) + 's';
+  return Math.floor(s/3600) + 'h ' + Math.floor((s%3600)/60) + 'm';
+}
+function fmtFreq(v){
+  const n = parseInt(v, 10);
+  if (isNaN(n)) return v || '—';
+  return n >= 1000000 ? (n/1000000).toFixed(2) + ' GHz' : (n/1000).toFixed(0) + ' MHz';
+}
+
+// Graficas en vivo: buffer circular (45 puntos) y dos canvas con tamaño real.
+const CHART = [];
+function chartPush(cpu, temp){
+  CHART.push({cpu: Math.max(0, Math.min(1, cpu || 0)), temp: temp || 0});
+  if (CHART.length > 45) CHART.shift();
+  drawCharts();
+}
+function drawCharts(){ drawChart(); drawCpuChart(); }
+function sizeCanvas(c){
+  const dpr = window.devicePixelRatio || 1;
+  const w = c.clientWidth || 300, h = c.clientHeight || 96;
+  const W = Math.round(w*dpr), H = Math.round(h*dpr);
+  if (c.width !== W || c.height !== H) { c.width = W; c.height = H; }
+  const ctx = c.getContext('2d');
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.clearRect(0,0,w,h);
+  return {ctx, w, h};
+}
+function drawChart(){
+  const c = $('#chart'); if (!c) return;
+  const g = sizeCanvas(c), ctx = g.ctx, w = g.w, h = g.h;
+  ctx.strokeStyle = 'rgba(255,255,255,.05)'; ctx.lineWidth = 1;
+  for (let i=1;i<4;i++){ const y = h*i/4; ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(w,y); ctx.stroke(); }
+  const n = HIST.length; if (n < 2) return;
+  const step = w/(n-1);
+  const yTemp = v => h-2-(Math.min(v,60)/60)*(h-6);
+  const yCpu  = v => h-2-Math.max(0,Math.min(1,v))*(h-6);
+  ctx.beginPath();
+  HIST.forEach((s,i)=>{ const x=i*step, y=yTemp(s.temp); i?ctx.lineTo(x,y):ctx.moveTo(x,y); });
+  ctx.strokeStyle = '#fbbf24'; ctx.lineWidth = 1.6; ctx.stroke();
+  ctx.beginPath();
+  HIST.forEach((s,i)=>{ const x=i*step, y=yCpu(s.cpu); i?ctx.lineTo(x,y):ctx.moveTo(x,y); });
+  ctx.lineTo(w,h); ctx.lineTo(0,h); ctx.closePath();
+  ctx.fillStyle = 'rgba(34,211,238,.16)'; ctx.fill();
+  ctx.beginPath();
+  HIST.forEach((s,i)=>{ const x=i*step, y=yCpu(s.cpu); i?ctx.lineTo(x,y):ctx.moveTo(x,y); });
+  ctx.strokeStyle = '#22d3ee'; ctx.lineWidth = 1.8; ctx.stroke();
+}
+// La tarjeta CPU tenia un canvas que nunca se dibujaba; ahora usa el mismo buffer.
+function drawCpuChart(){
+  const c = document.getElementById('chartCpu'); if (!c) return;
+  const g = sizeCanvas(c), ctx = g.ctx, w = g.w, h = g.h;
+  ctx.strokeStyle = 'rgba(255,255,255,.05)'; ctx.lineWidth = 1;
+  for (let i=1;i<4;i++){ const y = h*i/4; ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(w,y); ctx.stroke(); }
+  const n = HIST.length; if (n < 2) return;
+  const step = w/(n-1);
+  const yCpu = v => h-2-Math.max(0,Math.min(1,v))*(h-6);
+  const yTemp = v => h-2-(Math.min(v,60)/60)*(h-6);
+  ctx.beginPath();
+  HIST.forEach((s,i)=>{ const x=i*step, y=yCpu(s.cpu); i?ctx.lineTo(x,y):ctx.moveTo(x,y); });
+  ctx.strokeStyle = '#22d3ee'; ctx.lineWidth = 1.8; ctx.stroke();
+  ctx.beginPath();
+  HIST.forEach((s,i)=>{ const x=i*step, y=yTemp(s.temp); i?ctx.lineTo(x,y):ctx.moveTo(x,y); });
+  ctx.strokeStyle = '#fbbf24'; ctx.lineWidth = 1.6; ctx.stroke();
+}
+
+// Navegacion principal: 3 pestanas (Inicio, IA Motor, Ajustes)
+$$('.tabbtn').forEach(b => b.onclick = () => {
+  $$('.tabbtn').forEach(x => x.classList.toggle('on', x === b));
+  $$('.tab').forEach(t => t.classList.toggle('active', t.id === 'tab-' + b.dataset.tab));
+  const t = b.dataset.tab;
+  if (t === 'inicio') { drawCharts(); loadTelemetry(); }
+  if (t === 'apps') { loadApps(); loadGames(); gsStatus(); }
+  if (t === 'tweaks') { loadAi(); loadScan(); loadAgent(); loadDevice(); refresh(); }
+  if (t === 'ajustes') { loadSettings(); }
+});
+window.addEventListener('resize', drawChart);
+let SCAN = [];
+let AUTO = true;
+
+async function refresh(){
+  const s = await j('/api/state');
+  if (!s || !s.profile) return;
+  $('#transport').textContent = HAS_KSU ? 'KernelSU (root)' : 'HTTP 127.0.0.1:8080';
+  $('#daemonText').textContent = 'ACTIVO';
+  const t = s.metrics.battery_temp_c;
+  $('#temp').textContent = t.toFixed(1);
+  const ts = $('#tempState');
+  ts.textContent = t >= 47 ? 'Crítico' : t >= 42 ? 'Caliente' : t >= 35 ? 'Templado' : 'Frío';
+  ts.className = 'chip sm ' + (t >= 47 ? 'bad' : t >= 42 ? 'warn' : 'ok');
+  $('#sugProfile').textContent = s.suggestion.profile;
+  $('#confFill').style.width = Math.round(s.suggestion.confidence*100) + '%';
+  $('#reason').textContent = `${s.suggestion.reason} (${Math.round(s.suggestion.confidence*100)}%)`;
+  $('#knobCount').textContent = `${s.knobs} controles`;
+  $('#stCpu').textContent = Math.round(s.metrics.cpu_load*100) + '%';
+  $('#stBat').textContent = (s.metrics.battery_pct != null ? s.metrics.battery_pct + '%' : '—') + (s.metrics.charging ? ' · cargando' : ' · batería');
+  $('#autoSw').classList.toggle('on', !!s.auto);
+  $('#gameSw').classList.toggle('on', !!s.gaming);
+  AUTO = !!s.auto;
+  const pb = document.getElementById('profileBtns'); if (pb) pb.classList.toggle('locked', AUTO);
+  const ph = document.getElementById('profileLockHint'); if (ph) ph.style.display = AUTO ? 'block' : 'none';
+  const homeP = document.getElementById('homeProfile'); if (homeP) homeP.textContent = s.profile;
+  const bs = document.getElementById('bannerState'); if (bs) bs.textContent = s.ai ? 'Activo' : 'Suspendido';
+  const top = document.getElementById('aiSwTop'); if (top) top.classList.toggle('on', !!s.ai);
+  $$('#profileBtns button').forEach(b => b.classList.toggle('on', b.dataset.p === s.profile));
+  $('#aiSw').classList.toggle('on', !!s.ai);
+  const aiStateEl = document.getElementById('aiState'); if (aiStateEl) aiStateEl.textContent = s.ai ? 'automática' : 'pausada';
+  const aiProfileEl = document.getElementById('aiProfile'); if (aiProfileEl) aiProfileEl.textContent = s.profile;
+  const aiAppEl = document.getElementById('aiApp'); if (aiAppEl) aiAppEl.textContent = 'App en uso: ' + (s.app || '—');
+  if (s.features) {
+    FEATURES = {governor: !!s.features.governor, freq: !!s.features.freq, scheduler: !!s.features.scheduler};
+  }
+  const heat = Math.max(0, Math.min(1, (t - 35) / 15));
+  const sat = Math.max(0, Math.min(1, 1 - 0.6 * heat - 0.2 * s.metrics.cpu_load));
+  const aiSatEl = document.getElementById('aiSat'); if (aiSatEl) aiSatEl.textContent = sat.toFixed(2);
+  const aiConfEl = document.getElementById('aiConf'); if (aiConfEl) aiConfEl.style.width = Math.round(sat * 100) + '%';
+  const setT = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
+  setT('mCpu', Math.round(s.metrics.cpu_load*100) + '%');
+  setT('mTemp', t.toFixed(1) + ' °C');
+  setT('mChg', s.metrics.charging ? 'sí' : 'no');
+  setT('mGame', s.gaming ? 'sí' : 'no');
+  setT('setPid', s.pid);
+  setT('setUptime', fmtUptime(s.uptime || 0));
+  setT('setKnobs', s.knobs);
+  const h = await j('/api/history');
+  if (Array.isArray(h)) {
+    HIST.length = 0;
+    h.slice(-60).forEach(x => HIST.push(x));
+    // Punto en vivo de este ciclo: la grafica se mueve aunque el historial vaya lento.
+    chartPush(s.metrics.cpu_load, t);
+    drawCharts();
+  }
+}
+
+async function loadScan(){
+  const k = await j('/api/scan');
+  if (!Array.isArray(k)) return;
+  SCAN = k;
+  const gov = k.find(x => x.path.endsWith('scaling_governor') && x.writable) || k.find(x => x.path.endsWith('scaling_governor'));
+  const max = k.find(x => x.path.endsWith('scaling_max_freq') && x.writable) || k.find(x => x.path.endsWith('scaling_max_freq'));
+  $('#stGov').textContent = gov ? (gov.current || '—') : '—';
+  $('#stFreq').textContent = max ? fmtFreq(max.current) : '—';
+  renderSections();
+}
+
+// Cubierta de mando: telemetria en vivo (frecuencias, memoria, red, refresco...)
+async function loadTelemetry(){
+  const t = await j('/api/telemetry');
+  if (!t || t.error) return;
+  TELEM = t;
+  $('#devName').textContent = t.device || 'Dispositivo';
+  $('#devSoc').textContent = t.soc || '—';
+  $('#devCpu').textContent = t.cpu_model || '—';
+  const f = v => v ? (v >= 1000 ? (v/1000).toFixed(2)+' GHz' : v+' MHz') : '—';
+  $('#cpuMin').textContent = f(t.cpu?.min_mhz);
+  $('#cpuMax').textContent = f(t.cpu?.max_mhz);
+  $('#cpuCur').textContent = f(t.cpu?.cur_mhz);
+  $('#cpuNow').textContent = t.cpu?.cur_mhz ? t.cpu.cur_mhz+' MHz' : '—';
+  $('#lvVolt').textContent = t.voltage_uv ? (t.voltage_uv/1e6).toFixed(2)+' V' : 'n/d';
+  $('#lvCores').textContent = t.cores_online || '—';
+  $('#lvPsi').textContent = t.mem?.pressure != null ? t.mem.pressure.toFixed(1)+'%' : 'n/d';
+  $('#lvDown').textContent = t.net?.rx_mbps != null ? t.net.rx_mbps.toFixed(1)+' Mbps' : 'n/d';
+  $('#lvUp').textContent = t.net?.tx_mbps != null ? t.net.tx_mbps.toFixed(1)+' Mbps' : 'n/d';
+  $('#lvHz').textContent = t.refresh_hz ? t.refresh_hz.toFixed(0)+' Hz' : 'n/d';
+  const pct = (u, tot) => tot ? Math.min(100, Math.round(u/tot*100)) : 0;
+  const ram = t.mem?.total_mb || 0;
+  const ramUsed = ram - (t.mem?.avail_mb || 0);
+  $('#barRam').style.width = pct(ramUsed, ram) + '%';
+  $('#txtRam').textContent = `${(ramUsed/1024).toFixed(1)} / ${(ram/1024).toFixed(1)} GB`;
+  $('#barZram').style.width = pct(t.zram?.used_mb || 0, t.zram?.total_mb || 0) + '%';
+  $('#txtZram').textContent = `${((t.zram?.used_mb || 0)/1024).toFixed(2)} / ${((t.zram?.total_mb || 0)/1024).toFixed(2)} GB`;
+  $('#barDisk').style.width = pct(t.storage?.used_mb || 0, t.storage?.total_mb || 0) + '%';
+  $('#txtDisk').textContent = `${((t.storage?.used_mb || 0)/1024).toFixed(1)} / ${((t.storage?.total_mb || 0)/1024).toFixed(1)} GB`;
+  $('#mtrixState').textContent = t.mem?.pressure != null ? `presión ${t.mem.pressure.toFixed(1)}%` : 'en vivo';
+  // Energia (Ajustes)
+  const enBat = document.getElementById('enBat'); if (enBat) enBat.textContent = t.bat?.pct != null ? t.bat.pct + ' %' : '—';
+  const enTemp = document.getElementById('enTemp'); if (enTemp) enTemp.textContent = t.bat?.temp_c != null ? t.bat.temp_c.toFixed(1) + ' °C' : '—';
+  const enState = document.getElementById('enState'); if (enState) enState.textContent = t.bat?.charging ? 'cargando' : 'descargando';
+  const enVolt = document.getElementById('enVolt'); if (enVolt) enVolt.textContent = t.voltage_uv ? (t.voltage_uv/1e6).toFixed(3) + ' V' : 'n/d';
+  const enSaver = document.getElementById('enSaver'); if (enSaver) enSaver.textContent = String(t.low_power || '').trim() === '1' ? 'activado' : 'desactivado';
+  const azS = document.getElementById('azStats');
+  if (azS) azS.textContent = (t.voltage_uv ? (t.voltage_uv/1e6).toFixed(2) + ' V' : '—') + ' · ' + (t.bat?.temp_c != null ? t.bat.temp_c.toFixed(1) + ' °C' : '—');
+  drawCpuChart();
+}
+
+let FILTER = 'all';
+
+// Lenguaje sencillo para los controles: titulo, descripcion y opciones amigables.
+const META = {
+  governor: {t:'Gobernador de CPU', ico:'⚡', d:'Cómo el procesador reparte entre ahorro y rendimiento.', opts:{performance:'Rendimiento', powersave:'Ahorro', schedutil:'Equilibrado', ondemand:'Adaptativo', conservative:'Conservador', userspace:'Manual', walt:'WALT', interactive:'Interactivo'}},
+  maxfreq: {t:'Frecuencia de CPU', ico:'📈', d:'Velocidad máxima que puede alcanzar el procesador. Bajarla reduce calor y consumo.', preset:'freq'},
+  minfreq: {t:'Frecuencia mínima de CPU', ico:'📉', d:'Velocidad mínima en reposo. Subirla puede gastar más batería.', preset:'freq'},
+  cpumax: {t:'Frecuencia máxima de fábrica', ico:'🏭', d:'El límite superior que permite el hardware.', ro:true},
+  cpumin: {t:'Frecuencia mínima de fábrica', ico:'🏭', d:'El límite inferior que permite el hardware.', ro:true},
+  scheduler: {t:'Planificador de almacenamiento', ico:'💾', d:'Orden en que se atienden las lecturas y escrituras del almacenamiento.', opts:{none:'Ninguno', noop:'Ninguno simple', cfq:'CFQ', bfq:'BFQ', 'mq-deadline':'Deadline', kyber:'Kyber', deadline:'Deadline'}},
+  soc: {t:'Temperatura del procesador', ico:'🌡', d:'Temperatura actual del SoC.', ro:true},
+  thermpol: {t:'Política térmica', ico:'🛡', d:'Cómo reacciona el sistema ante el calor.', ro:true},
+  lmk: {t:'Memoria para aplicaciones', ico:'🧩', d:'RAM que se reserva antes de cerrar apps en segundo plano.', opts:{}},
+  curfreq: {t:'Frecuencia actual de CPU', ico:'📍', d:'Velocidad a la que trabaja ahora mismo el procesador.', ro:true},
+  zramalgo: {t:'Compresor de ZRAM', ico:'🗜', d:'Algoritmo que comprime la memoria de intercambio.'},
+  zramsize: {t:'Tamaño de ZRAM', ico:'🧠', d:'RAM reservada como intercambio comprimido. Se muestra en GB.'},
+  ztype: {t:'Tipo de zona térmica', ico:'🏷', d:'Qué componente mide esta zona (batería, SoC, piel…).', ro:true},
+  swappiness: {t:'Uso de intercambio', ico:'🔄', d:'Qué tanto prefiere el sistema usar ZRAM antes que descartar apps.'},
+  vfs: {t:'Presión de caché', ico:'🗂', d:'Cómo se libera la caché de archivos. Valores bajos conservan datos en RAM.'},
+  dirty: {t:'Escrituras pendientes', ico:'✍️', d:'Cuántos datos se acumulan en RAM antes de escribirse al disco.'},
+  dirtybg: {t:'Escrituras en segundo plano', ico:'🧾', d:'Umbral para empezar a escribir datos pendientes en segundo plano.'},
+  tcpcc: {t:'Control de congestión de red', ico:'🌐', d:'Cómo TCP acelera y frena según la congestión de la red.'},
+  fastopen: {t:'TCP Fast Open', ico:'⚡', d:'Abreva la conexión combinando el saludo inicial con los datos.'},
+  rmem: {t:'Buffer de recepción', ico:'📥', d:'Tamaño máximo del búfer de red para datos entrantes.'},
+  wmem: {t:'Buffer de envío', ico:'📤', d:'Tamaño máximo del búfer de red para datos salientes.'},
+  latency: {t:'Latencia de planificación', ico:'⏱', d:'Tiempo que el planificador da a cada tarea. Menos = más fluido, más consumo.'},
+  granularity: {t:'Granularidad mínima', ico:'🔬', d:'Duración mínima de una tarea antes de permitir un cambio.'},
+  wakeup: {t:'Despertar de tareas', ico:'⏰', d:'Cuándo una tarea dormida puede adelantarse a otra en ejecución.'},
+  gpugov: {t:'Gobernador de GPU', ico:'🎮', d:'Cómo la tarjeta gráfica reparte entre ahorro y rendimiento.'},
+  gpurange: {t:'Frecuencias de GPU', ico:'📊', d:'Velocidades que permite el hardware de la GPU.', ro:true},
+  gpumax: {t:'Frecuencia máxima de GPU', ico:'📈', d:'Límite superior de la GPU. Bajarlo reduce calor y consumo.'},
+  gpumin: {t:'Frecuencia mínima de GPU', ico:'📉', d:'Límite inferior de la GPU.'},
+  gpucur: {t:'Frecuencia actual de GPU', ico:'📍', d:'Velocidad actual de la GPU.', ro:true},
+};
+
+let FEATURES = {governor:true, freq:true, scheduler:true};
+function featKey(x){
+  if (x.path.endsWith('scaling_governor')) return 'governor';
+  if (x.path.endsWith('scaling_max_freq') || x.path.endsWith('scaling_min_freq')) return 'freq';
+  if (x.path.includes('queue/scheduler')) return 'scheduler';
+  return null;
+}
+
+function metaFor(x){
+  const p = x.path;
+  const blk = (p.match(/\/block\/([^/]+)\//) || [])[1];
+  const zone = (p.match(/thermal_zone\d+/) || [])[0];
+  if (p.endsWith('scaling_governor')) return META.governor;
+  if (p.endsWith('scaling_max_freq')) return META.maxfreq;
+  if (p.endsWith('scaling_min_freq')) return META.minfreq;
+  if (p.endsWith('scaling_cur_freq')) return META.curfreq;
+  if (p.endsWith('cpuinfo_max_freq')) return META.cpumax;
+  if (p.endsWith('cpuinfo_min_freq')) return META.cpumin;
+  if (p.endsWith('queue/scheduler')) return {...META.scheduler, t: blk ? `Planificador · ${blk}` : META.scheduler.t};
+  if (p.endsWith('comp_algorithm')) return META.zramalgo;
+  if (p.endsWith('disksize')) return META.zramsize;
+  if (/\/thermal_zone\d+\/temp$/.test(p)) return {...META.soc, t: zone ? `Temperatura · ${zone}` : META.soc.t};
+  if (/\/thermal_zone\d+\/type$/.test(p)) return META.ztype;
+  if (/\/thermal_zone\d+\/policy$/.test(p)) return META.thermpol;
+  if (p.endsWith('minfree')) return META.lmk;
+  if (p.endsWith('swappiness')) return META.swappiness;
+  if (p.endsWith('vfs_cache_pressure')) return META.vfs;
+  if (p.endsWith('dirty_ratio')) return META.dirty;
+  if (p.endsWith('dirty_background_ratio')) return META.dirtybg;
+  if (p.endsWith('tcp_congestion_control')) return META.tcpcc;
+  if (p.endsWith('tcp_fastopen')) return META.fastopen;
+  if (p.endsWith('rmem_max')) return META.rmem;
+  if (p.endsWith('wmem_max')) return META.wmem;
+  if (p.endsWith('sched_latency_ns')) return META.latency;
+  if (p.endsWith('sched_min_granularity_ns')) return META.granularity;
+  if (p.endsWith('sched_wakeup_granularity_ns')) return META.wakeup;
+  if (p.includes('kgsl') || p.includes('mali')) {
+    if (p.endsWith('governor') || p.endsWith('dvfs_governor')) return META.gpugov;
+    if (p.endsWith('available_frequencies')) return META.gpurange;
+    if (p.endsWith('max_freq') || p.endsWith('max_gpuclk')) return META.gpumax;
+    if (p.endsWith('min_freq')) return META.gpumin;
+    if (p.endsWith('cur_freq')) return META.gpucur;
+  }
+  const byDomain = {cpu_governor: META.governor, cpu_freq: META.maxfreq, gpu: META.gpucur, io_scheduler: META.scheduler, thermal: META.soc, memory: META.lmk, network: META.tcpcc, responsiveness: META.latency};
+  return byDomain[x.domain] || {t:'Control del sistema', ico:'⚙', d:'Parámetro del sistema. Se aplica con verificación y rollback.', ro:!x.writable};
+}
+
+function freqPresets(x){  const rel = 'cpuinfo_max_freq';
+  const base = parseInt((SCAN.find(k => k.path === x.path.replace(/scaling_(min|max)_freq/, rel)) || {}).current, 10);
+  if (!base) return [];
+  const pcts = x.path.includes('scaling_max_freq') ? [60, 75, 85, 100] : [25, 50, 75, 100];
+  return pcts.map(p => Math.round(base * p / 100 / 1000) * 1000);
+}
+
+// Valor legible: temperaturas en °C y frecuencias en Hz con unidad.
+function sliderStep(x){
+  const p = x.path;
+  if (p.includes('freq')) return 10000;
+  if (p.endsWith('disksize')) return 1073741824;
+  if (p.endsWith('_ns')) return 100000;
+  if (p.endsWith('minfree')) return 256;
+  return 1;
+}
+function fmtVal(x, cur){
+  if (!cur) return '—';
+  const p = x.path;
+  const n = parseFloat(cur);
+  if (/\/thermal_zone\d+\/temp$/.test(p)) {
+    if (isNaN(n)) return cur;
+    // las zonas termicas de Android usan miligrados; algunas, decimas
+    return (Math.abs(n) >= 1000 ? n/1000 : n/10).toFixed(1) + ' °C';
+  }
+  if (p.includes('freq') || p.endsWith('gpuclk')) return fmtFreq(cur);
+  if (p.endsWith('disksize') && !isNaN(n)) return (n/1024/1024/1024).toFixed(2) + ' GB';
+  if (p.endsWith('minfree') && !isNaN(n)) return (n*4/1024).toFixed(0) + ' MB';
+  if ((p.endsWith('dirty_ratio') || p.endsWith('dirty_background_ratio')) && !isNaN(n)) return n + ' %';
+  if (p.endsWith('_ns') && !isNaN(n)) return (n/1e6).toFixed(2) + ' ms';
+  if (p.endsWith('swappiness') && !isNaN(n)) return n + ' / 100';
+  if ((p.endsWith('rmem_max') || p.endsWith('wmem_max')) && !isNaN(n)) return (n/1024/1024).toFixed(1) + ' MB';
+  if (p.endsWith('tcp_fastopen') && !isNaN(n)) return n;
+  return cur;
+}
+
+function isActive(x, a){
+  const c = (x.current || '').trim();
+  if (c.includes('[')) return c.includes('[' + a + ']');
+  return c === a; // sin corchetes: el valor actual es el activo
+}
+
+function renderKnobs(targetId, domains){
+  const el = document.getElementById(targetId || 'knobList');
+  if (!el) return;
+  const list = (domains && domains.length) ? SCAN.filter(x => domains.includes(x.domain)) : [];
+  if (!domains || domains.length === 0) {
+    // Categoria sin nodos del kernel: no se mezclan controles de otras categorias.
+    el.innerHTML = '<div class="empty">Esta sección no tiene nodos editables del kernel en este dispositivo. Consulta su información en vivo más arriba.</div>';
+    return;
+  }
+  el.innerHTML = list.map(x => {
+    const id = x.path.replace(/[^a-zA-Z0-9]/g, '_');
+    const m = metaFor(x);
+    const fk = featKey(x);
+    const blk = (x.path.match(/\/block\/([^/]+)\//) || [])[1];
+    const title = blk ? `${m.t} · ${blk}` : m.t;
+    const cur = fmtVal(x, x.current);
+    let ctrl;
+    if (!x.writable) ctrl = '<span class="badge">solo lectura</span>';
+    else if (m.opts && x.allowed.length) {
+      ctrl = x.allowed.map(a => `<button data-knob="${id}" data-val="${a}" class="${isActive(x, a) ? 'on' : ''}">${m.opts[a] || a}</button>`).join('');
+    } else if (m.preset === 'freq' && (x.min == null || x.max == null)) {
+      ctrl = (freqPresets(x) || []).map(v => `<button data-knob="${id}" data-val="${v}" class="${String(v) === String(x.current) ? 'on' : ''}">${fmtFreq(String(v))}</button>`).join('') || '<span class="badge">sin valores base</span>';
+    } else if (x.min != null && x.max != null) {
+      // Slider con rango seguro estricto: nunca texto libre.
+      const cur = x.current || String(x.min);
+      ctrl = `<div class="sliderow">
+        <input type="range" data-knob-range="${id}" min="${x.min}" max="${x.max}" step="${sliderStep(x)}" value="${cur}">
+        <b id="val-${id}">${fmtVal(x, cur)}</b>
+      </div>
+      <div class="hint">Recomendado: ${fmtVal(x, String(x.min))} - ${fmtVal(x, String(x.max))}</div>
+      <button class="action sm" data-knob-apply="${id}">Aplicar</button>`;
+    } else {
+      ctrl = '<span class="badge">sin control seguro disponible</span>';
+    }
+    return `<div class="knob ${fk && !FEATURES[fk] ? 'off' : ''}">
+      <div class="head"><div class="ico">${m.ico || '⚙'}</div><div class="ttl">${title}</div><div class="head-actions">${fk ? `<span class="switch ${FEATURES[fk] ? 'on' : ''}" data-feat="${fk}"></span>` : ''}<span class="badge">${x.writable ? 'editable' : 'solo lectura'}</span></div></div>
+      <div class="desc">${m.d}</div>
+      <div class="cur">${cur}</div>
+      <div class="acts">${ctrl}</div>
+      <span class="tgl" data-tech="${id}">ver detalles técnicos</span>
+      <div class="tech" id="tech-${id}">${x.path} · ${x.domain} · ${x.current || ''}</div>
+    </div>`;
+  }).join('') || '<div class="empty">Sin controles en este grupo.</div>';
+  const q = s => el.querySelectorAll(s);
+  q('[data-knob]').forEach(b => b.onclick = () => applyKnob(b.dataset.knob, b.dataset.val));
+  q('[data-knob-range]').forEach(r => r.oninput = () => {
+    const l = document.getElementById('val-' + r.dataset.knobRange);
+    const k = SCAN.find(x => x.path.replace(/[^a-zA-Z0-9]/g, '_') === r.dataset.knobRange);
+    if (l) l.textContent = k ? fmtVal(k, r.value) : r.value;
+  });
+  q('[data-knob-apply]').forEach(b => b.onclick = () => {
+    const r = el.querySelector('[data-knob-range="' + b.dataset.knobApply + '"]');
+    if (r) applyKnob(b.dataset.knobApply, r.value);
+  });
+  q('[data-tech]').forEach(b => b.onclick = () => $('#tech-' + b.dataset.tech).classList.toggle('open'));
+  q('[data-feat]').forEach(s => s.onclick = async () => {
+    const k = s.dataset.feat;
+    const on = !s.classList.contains('on');
+    s.classList.toggle('on', on);
+    await j('/api/features', {method:'POST', body: JSON.stringify({[k]: on})});
+    FEATURES[k] = on;
+    renderKnobs('detBody', DETAIL.domains);
+    refresh();
+  });
+}
+
+async function applyKnob(id, val){
+  const k = SCAN.find(x => x.path.replace(/[^a-zA-Z0-9]/g, '_') === id);
+  if (!k) return;
+  if (!val) {
+    val = prompt(`Nuevo valor para ${k.path}`, k.current || '');
+    if (val === null) return;
+  }
+  const r = await j('/api/knob', {method:'POST', body: JSON.stringify({path: k.path, value: val})});
+  log(`${r.ok ? 'ok' : 'fallo'} ${k.path} -> ${r.after || '?'} (${r.note || ''})`);
+  loadScan();
+  refresh();
+}
+
+// IA Motor: estado, journal y diagnostico Atlas
+async function loadAi(){
+  const a = await j('/api/ai');
+  if (!a || a.error) return;
+  const el = id => document.getElementById(id);
+  if (el('aiSw')) el('aiSw').classList.toggle('on', !!a.ai);
+  if (el('aiProfile')) el('aiProfile').textContent = a.profile || '—';
+  if (el('aiReason')) el('aiReason').textContent = (a.last && a.last.reason) || '—';
+  if (el('aiObj')) el('aiObj').textContent = a.objective || '—';
+  if (el('aiNext')) el('aiNext').textContent = a.next ? `Proximo: ${a.next.path} → ${a.next.value}` : 'Sin cambios.';
+  if (el('aiSat')) el('aiSat').textContent = (a.satisfaction != null ? a.satisfaction : 0).toFixed(2);
+  if (el('aiConf')) el('aiConf').style.width = '100%';
+  if (el('aiLast')) el('aiLast').textContent = a.last ? `Ultimo: ${a.last.profile} · ${a.last.reason}` : 'Sin analisis.';
+  if (el('aiAct')) el('aiAct').textContent = (a.last && a.last.reason) || 'Sin actividad.';
+  if (el('iaActState')) el('iaActState').textContent = a.ai ? 'automatica' : 'pausada';
+  if (el('iaGoal')) el('iaGoal').textContent = a.objective || '—';
+  if (el('iaNextStep')) el('iaNextStep').textContent = a.next ? `${a.next.path} → ${a.next.value}` : 'Nada pendiente.';
+  if (el('iaAfter')) el('iaAfter').textContent = a.learning != null ? `Aprendizaje: ${a.learning} verificadas` : '—';
+  if (el('mCpu')) el('mCpu').textContent = '—';
+  if (el('mTemp')) el('mTemp').textContent = '—';
+  if (el('mChg')) el('mChg').textContent = '—';
+  if (el('mGame')) el('mGame').textContent = '—';
+  if (el('jourCount')) el('jourCount').textContent = (a.journal || []).length;
+  if (el('journal')) el('journal').innerHTML = '<div class="empty">Ver la pestaña Diario.</div>';
+  if (el('learnCount')) el('learnCount').textContent = (a.learning || 0) + ' verificadas';
+  if (el('apps')) el('apps').innerHTML = '<div class="empty">Contexto en Descripcion.</div>';
+  if (el('caps')) el('caps').innerHTML = '<div class="empty">Capacidades en el Panel.</div>';
+  if (el('weights')) el('weights').innerHTML = '<div class="empty">Pesos en Aprendizaje.</div>';
+  if (el('atlasOk')) el('atlasOk').textContent = (a.atlas || []).length ? 'ver' : '—';
+  if (el('atlasList')) el('atlasList').innerHTML = '<div class="empty">Atlas en Panel.</div>';
+}
+
+// Perfiles y conmutadores
+$$('#profileBtns button').forEach(b => b.onclick = async () => {
+  if (AUTO) { log('Modo automático activo: IA Motors decide el perfil.'); return; }
+  const r = await j('/api/profile', {method:'POST', body: JSON.stringify({profile: b.dataset.p})});
+  log(`perfil ${b.dataset.p}: ${r.applied}/${r.total} cambios aplicados`);
+  refresh();
+});
+$('#autoSw').onclick = async () => {
+  const on = $('#autoSw').classList.toggle('on');
+  await j('/api/auto', {method:'POST', body: JSON.stringify({enabled: on})});
+  log('modo automático ' + (on ? 'activado' : 'desactivado'));
+  refresh();
+};
+$('#gameSw').onclick = async () => {
+  const on = $('#gameSw').classList.toggle('on');
+  await j('/api/gaming', {method:'POST', body: JSON.stringify({enabled: on})});
+  log('simulación de juego ' + (on ? 'activada' : 'desactivada'));
+  refresh();
+};
+
+// Secciones de Tweaks (estilo AZenith)
+const SECTIONS = [
+  {id:'cpu', t:'CPU', d:'Gobernador, frecuencias, clústeres y afinidad.', c:'#10b981', domains:['cpu_governor','cpu_freq']},
+  {id:'gpu', t:'GPU', d:'Rango, gobernador y límites de la gráfica.', c:'#38bdf8', domains:['gpu']},
+  {id:'memoria', t:'Memoria', d:'ZRAM, intercambio y memoria para apps.', c:'#a78bfa', domains:['memory']},
+  {id:'sensibilidad', t:'Sensibilidad', d:'Planificación y prioridad de E/S.', c:'#f59e0b', domains:['responsiveness']},
+  {id:'termico', t:'Térmico', d:'Zonas térmicas y estrangulamiento.', c:'#ef4444', domains:['thermal']},
+  {id:'almacenamiento', t:'Almacenamiento', d:'Planificadores de E/S y presión del sistema de archivos.', c:'#14b8a6', domains:['io_scheduler']},
+  {id:'red', t:'Red', d:'Congestión, buffers y estado de red.', c:'#60a5fa', domains:['network']},
+  {id:'audio', t:'Audio', d:'Propiedades reales de audio de Android.', c:'#f472b6', domains:[]},
+  {id:'monitor', t:'Monitor de tareas', d:'Procesos en vivo y uso de recursos.', c:'#34d399', domains:[]}
+];
+let DETAIL = {id:'', title:'', desc:'', domains:[], info:[]};
+
+function renderSections(){
+  const el = document.getElementById('grpSections');
+  if (!el) return;
+  el.innerHTML = SECTIONS.map(c => `<button class="catcard" style="--c:${c.c}" data-id="${c.id}">
+    <span class="t">${c.t}</span><span class="d">${c.d}</span><span class="go">Ver →</span></button>`).join('');
+  el.querySelectorAll('.catcard').forEach(b => b.onclick = () => openDetail(b.dataset.id));
+}
+
+function openDetail(id){
+  let card = null;
+  for (const c of SECTIONS) { if (c.id === id) { card = c; break; } }
+  if (!card) return;
+  DETAIL = {...card};
+  $('#detTitle').textContent = card.t;
+  $('#detDesc').textContent = card.d;
+  $('#ctrlHome').style.display = 'none';
+  $('#ctrlDetail').style.display = 'block';
+  const info = [];
+  if (id === 'audio') info.push('Estado real de las propiedades de audio de Android.');
+  if (id === 'monitor') info.push('Toca un proceso para ver sus datos.');
+  $('#detInfo').innerHTML = info.map(x => `<div class="dec"><span>${x}</span></div>`).join('');
+  if (id === 'monitor') { loadProcesses(); $('#detBody').innerHTML = ''; }
+  else if (id === 'audio') { $('#detBody').innerHTML = '<div class="dec">Cargando propiedades de audio…</div>'; loadAudio('detBody'); }
+  else renderKnobs('detBody', card.domains);
+}
+
+// Carga bypass (deteccion, interruptor, prueba y diagnostico de nodos)
+function bpMsg(t){
+  const el = document.getElementById('bpMsg');
+  if (el) el.textContent = t || '';
+}
+function bindBypass(){
+  const sw = document.getElementById('bpSw');
+  if (sw && !sw.dataset.bound) { sw.dataset.bound = '1'; sw.onclick = onBpSw; }
+  const chk = document.getElementById('bpCheck');
+  if (chk && !chk.dataset.bound) { chk.dataset.bound = '1'; chk.onclick = onBpCheck; }
+  const diag = document.getElementById('bpDiag');
+  if (diag && !diag.dataset.bound) { diag.dataset.bound = '1'; diag.onclick = onBpDiag; }
+}
+function onBpSw(){
+  j('/api/bypass').then(b => {
+    const target = !document.getElementById('bpSw').classList.contains('on');
+    return j('/api/bypass-set', {method:'POST', body: JSON.stringify({enable: target, path: bypassNode(b)})});
+  }).then(r => {
+    window.__bpDiag = null;
+    bpMsg(r.detail || (r.ok ? 'ok' : 'fallo'));
+    loadBypass();
+  }).catch(() => bpMsg('no se pudo aplicar el bypass'));
+}
+function onBpCheck(){ loadBypass(); bpMsg('nodos comprobados'); }
+async function onBpDiag(){
+  bpMsg('probando nodos…');
+  const d = await j('/api/bypass-diagnose');
+  if (!d || d.error) { bpMsg('no se pudo ejecutar el diagnóstico'); return; }
+  renderBypassNodes(null, d);
+  const rec = d.recommended ? nodoDesc(d.recommended, d.results) : '';
+  window.__bpDiag = d;
+  bpMsg(rec ? `recomendado: ${rec} (${d.tested} nodo(s) probados)` : `ningún nodo funciona (${d.tested} probados)`);
+}
+function nodoDesc(path, results){
+  const r = (results || []).find(x => x.path === path);
+  return r ? r.desc : path;
+}
+async function loadBypass(){
+  const b = await j('/api/bypass');
+  if (!b || b.error) return;
+  const c = document.getElementById('bpCharger'); if (c) c.textContent = b.charger ? 'sí' : 'no';
+  const st = document.getElementById('bpState');
+  if (st) { st.textContent = b.active ? 'activo' : 'inactivo'; st.className = 'chip sm ' + (b.active ? 'ok' : ''); }
+  const th = document.getElementById('bpThr'); if (th) th.textContent = b.threshold + ' %';
+  const bat = document.getElementById('bpBat'); if (bat) bat.textContent = b.battery_pct + ' %';
+  const nodeEl = document.getElementById('bpNode'); if (nodeEl) nodeEl.textContent = b.node || '—';
+  window.__bpNode = b.node || '';
+  window.__bpNodes = b.nodes || [];
+  buildThrBtns(b.threshold);
+  const sw = document.getElementById('bpSw'); if (sw) sw.classList.toggle('on', !!b.active);
+  renderBypassNodes(b.nodes || [], window.__bpDiag || null);
+}
+function renderBypassNodes(nodes, diag){
+  const el = document.getElementById('bpNodes');
+  if (!el) return;
+  const all = nodes || window.__bpNodes || [];
+  const present = all.filter(n => n.exists);
+  const rec = diag && diag.recommended ? diag.recommended : '';
+  const results = diag ? diag.results || [] : [];
+  if (!present.length) { el.innerHTML = '<div class="empty">Sin nodos de bypass en este dispositivo.</div>'; return; }
+  el.innerHTML = present.map(n => {
+    const res = results.find(x => x.path === n.path);
+    const badges = [];
+    if (n.path === (window.__bpNode || '')) badges.push('<span class="badge">en uso</span>');
+    if (n.path === rec) badges.push('<span class="badge warn">recomendado</span>');
+    if (n.risky) badges.push('<span class="badge bad">riesgoso</span>');
+    const ok = res ? res.ok : null;
+    const color = ok === true ? 'var(--g1)' : ok === false ? 'var(--bad)' : 'var(--mut)';
+    const stateTxt = res ? (res.ok ? 'funciona' : 'no funciona') : n.state;
+    const rid = n.path.replace(/[^a-zA-Z0-9]/g, '_');
+    return `<div class="dec"><span>${n.desc}${badges.join(' ')}<br><span class="ro">${n.path} · actual ${n.current || '—'} · ${n.writable ? 'escribible' : 'solo lectura'}</span><br><span class="ro" style="color:${color}" data-res="${rid}">${res ? res.detail : 'sin probar'}</span></span><span style="display:flex;gap:6px;align-items:center"><b style="color:${color}">${stateTxt}</b><button class="action sm" style="width:auto;margin:0;padding:6px 10px" data-test="${n.path}">Probar</button></span></div>`;
+  }).join('');
+  el.querySelectorAll('[data-test]').forEach(btn => btn.onclick = async () => {
+    const p = btn.dataset.test;
+    const rid = p.replace(/[^a-zA-Z0-9]/g, '_');
+    const out = el.querySelector(`[data-res="${rid}"]`);
+    if (out) out.textContent = 'probando…';
+    const r = await j('/api/bypass-test', {method:'POST', body: JSON.stringify({path: p})});
+    if (out) out.textContent = r.detail || (r.ok ? 'funciona' : 'fallo');
+  });
+}
+function bypassNode(b){
+  if (b && b.node) return b.node;
+  const n = (b.nodes || []).find(x => x.exists && x.writable && !x.risky);
+  return n ? n.path : '';
+}
+// Opciones de umbral (recomendado 50–80)
+function buildThrBtns(cur){
+  const el = document.getElementById('bpThrBtns');
+  if (!el) return;
+  const vals = [30,40,50,60,70,80,90,100];
+  el.innerHTML = vals.map(v => `<button class="modebtn ${v === cur ? 'on' : ''} ${v >= 50 && v <= 80 ? 'rec' : ''}" data-thr="${v}">${v}%</button>`).join('');
+  el.querySelectorAll('.modebtn').forEach(b => b.onclick = async () => {
+    const v = parseInt(b.dataset.thr, 10);
+    const r = await j('/api/bypass-threshold', {method:'POST', body: JSON.stringify({value: v})});
+    bpMsg('umbral: ' + (r.detail || (r.ok ? 'ok' : 'fallo')));
+    loadBypass();
+  });
+  const range = document.getElementById('bpThrRange');
+  if (range) range.value = cur;
+  if (range && !range.dataset.bound) {
+    range.dataset.bound = '1';
+    range.onchange = async () => {
+      const v = parseInt(range.value, 10);
+      const r = await j('/api/bypass-threshold', {method:'POST', body: JSON.stringify({value: v})});
+      bpMsg('umbral: ' + (r.detail || (r.ok ? 'ok' : 'fallo')));
+      loadBypass();
+    };
+  }
+}
+// Motor de renderizado
+async function loadRenderer(){
+  const r = await j('/api/renderer');
+  if (!r || r.error) return;
+  const cur = document.getElementById('rdCur');
+  if (cur) cur.textContent = r.current;
+  const el = document.getElementById('rdBtns');
+  if (!el) return;
+  el.innerHTML = (r.options || []).map(o => `<button class="modebtn ${o.active ? 'on' : ''}" data-rd="${o.name}">${o.name}</button>`).join('');
+  el.querySelectorAll('.modebtn').forEach(b => b.onclick = async () => {
+    const rr = await j('/api/renderer', {method:'POST', body: JSON.stringify({value: b.dataset.rd})});
+    log('render: ' + (rr.detail || (rr.ok ? 'ok' : 'fallo')));
+    loadRenderer();
+  });
+}
+// Estado real de audio (propiedades de Android; sin inventar nodos de kernel)
+async function loadAudio(targetId){
+  const a = await j('/api/audio');
+  const el = document.getElementById(targetId || 'audioProps');
+  if (!el) return;
+  const props = a?.props || [];
+  el.innerHTML = props.length
+    ? props.map(p => `<div class="dec"><span>${p.key}</span><b>${p.value || '—'}</b></div>`).join('')
+    : '<div class="empty">El kernel no expone nodos editables de audio en este dispositivo.</div>';
+}
+// Pantalla: refresco real, selector de Hz, motor de renderizado, densidad y tamaño
+async function loadDisplay(){
+  const d = await j('/api/display');
+  if (!d || d.error) return;
+  const hz = document.getElementById('dpHz'); if (hz) hz.textContent = d.refresh_hz + ' Hz';
+  const den = document.getElementById('dpDen'); if (den) den.textContent = String(d.density || '').replace(/\n/g, ' · ');
+  const size = document.getElementById('dpSize'); if (size) size.textContent = String(d.size || '').replace(/\n/g, ' · ');
+  const box = document.getElementById('dpHzBtns');
+  if (!box) return;
+  const cur = Math.round(d.refresh_hz || 0);
+  box.innerHTML = [60, 90, 120].map(v => `<button class="modebtn ${v === cur ? 'on' : ''}" data-hz="${v}">${v} Hz</button>`).join('');
+  box.querySelectorAll('.modebtn').forEach(b => b.onclick = async () => {
+    const r = await j('/api/quick', { action: 'hz', value: b.dataset.hz });
+    log('pantalla: ' + (r.detail || (r.ok ? 'ok' : 'fallo')));
+    loadDisplay();
+  });
+}
+// Perfil de dispositivo y actividad del agente
+async function loadDevice(){
+  const d = await j('/api/device');
+  if (!d || d.error) return;
+  $('#devAdapt').textContent = `${d.vendor} · GPU ${d.gpu} · ${d.features.length} capacidades`;
+  const pfDev = document.getElementById('pfDev'); if (pfDev) pfDev.textContent = d.device || '—';
+  const pfSoc = document.getElementById('pfSoc'); if (pfSoc) pfSoc.textContent = (d.vendor ? d.vendor + ' ' : '') + (d.soc || '');
+  const pfGpu = document.getElementById('pfGpu'); if (pfGpu) pfGpu.textContent = d.gpu || '—';
+  const pfFeat = document.getElementById('pfFeat'); if (pfFeat) pfFeat.textContent = d.features.length + ' capacidades';
+  const azK = document.getElementById('azKernel'); if (azK) azK.textContent = d.kernel_version || d.kernel || '—';
+  const azD = document.getElementById('azDevice'); if (azD) azD.textContent = d.device || '—';
+  const azC = document.getElementById('azChip'); if (azC) azC.textContent = ((d.vendor ? d.vendor + ' ' : '') + (d.soc || '')).trim() || '—';
+  const azR = document.getElementById('homeRoot'); if (azR) azR.textContent = 'Obtenido';
+}
+async function loadAgent(){
+  const a = await j('/api/agent');
+  if (!a || a.error) return;
+  const el = id => document.getElementById(id);
+  el('agActivity').textContent = a.current_activity || 'En espera';
+  el('agPhase').textContent = a.phase || '';
+  el('motorsSub').textContent = 'Monitoreo — ' + (a.phase || 'en espera') + ' · ciclo ' + (a.cycle || 0);
+  const target = a.target != null ? a.target : 0.75;
+  if (a.satisfaction != null) {
+    el('mtSat').textContent = a.satisfaction.toFixed(3);
+    el('mtSatBar').style.width = Math.round(a.satisfaction * 100) + '%';
+    el('mtObjective').textContent = 'objetivo ' + target.toFixed(3) + (a.satisfaction >= target ? ' · dentro del objetivo' : ' · por debajo del objetivo');
+  }
+  const ac = a.app_context || {};
+  el('mtApp').textContent = ac.package || '—';
+  el('mtScreen').textContent = ac.screen || '—';
+  el('mtProfile').textContent = ac.profile || '—';
+  el('mtRam').textContent = ac.ram_pct != null ? ac.ram_pct.toFixed(0) + ' %' : '—';
+  const th = a.thermal || {};
+  const ob = a.objectives || {};
+  el('mtCpu').textContent = ob.actuacion != null ? ob.actuacion.toFixed(0) + ' %' : '—';
+  el('mtTemp').textContent = th.soc_max_c != null ? th.soc_max_c + ' °C' : '—';
+  el('mtBat').textContent = ob.bateria != null ? ob.bateria.toFixed(0) + ' %' : '—';
+  const ls = a.learning_stats || {};
+  const sample = ls.sample != null ? ls.sample : 0;
+  const measured = ls.measured_decisions != null ? ls.measured_decisions : 0;
+  const honesty = ls.honesty_pct != null ? ls.honesty_pct : 0;
+  const winH = (ls.window_s || 0) / 3600;
+  el('lrHonesty').textContent = sample > 0 ? honesty.toFixed(0) + ' %' : 'sin datos';
+  el('lrHonestyHint').textContent = sample > 0
+    ? `${measured} de ${sample} acciones con medición real en ${winH.toFixed(1)} h. Con menos de 2 h de uso la muestra es pequeña y el porcentaje puede cambiar mucho.`
+    : 'Todavía no hay acciones registradas. El motor mide cada cambio (ante y después); cuando existan datos verás aquí el porcentaje real.';
+  el('lrVerified').textContent = ls.verified != null ? ls.verified : '—';
+  el('lrMeasured').textContent = measured;
+  el('lrOverrides').textContent = ls.user_overrides != null ? ls.user_overrides : '—';
+  el('lrWindow').textContent = sample > 0 ? winH.toFixed(1) + ' h' : '—';
+  const w = ls.weights || [];
+  el('lrWeightsCount').textContent = w.length;
+  el('lrWeights').innerHTML = w.length
+    ? w.map(x => `<div class="dec"><span>${x.mode} · ${x.kind} · ${x.samples} muestras</span><b style="color:${x.temp_delta < 0 ? 'var(--g1)' : 'var(--warn)'}">${x.temp_delta > 0 ? '+' : ''}${Number(x.temp_delta).toFixed(2)} °C</b></div>`).join('')
+    : '<div class="empty">Aún sin datos: hacen falta acciones verificadas.</div>';
+  const pa = ls.per_app || [];
+  el('lrPerApp').innerHTML = pa.length
+    ? pa.map(x => `<div class="dec"><span>${x.app}</span><b>${x.verified}</b></div>`).join('')
+    : '<div class="empty">Sin acciones por app todavía.</div>';
+  setBar('obAct', ob.actuacion); setBar('obBat', ob.bateria); setBar('obEsp', ob.espacio_termico);
+  el('obActT').textContent = (ob.actuacion != null ? ob.actuacion : 0).toFixed(0) + ' %';
+  el('obBatT').textContent = (ob.bateria != null ? ob.bateria : 0).toFixed(0) + ' %';
+  el('obEspT').textContent = (ob.espacio_termico != null ? ob.espacio_termico : 0).toFixed(0) + ' %';
+  el('thGov').textContent = th.governor || '—';
+  el('thInt').textContent = th.interventions != null ? th.interventions : '—';
+  el('thSoc').textContent = th.soc_max_c != null ? th.soc_max_c + ' °C' : '—';
+  el('thBat').textContent = th.battery_c != null ? th.battery_c.toFixed(1) + ' °C' : '—';
+  renderDiario(a);
+  const u = a.unresolved_errors || [];
+  el('unresCount').textContent = u.length;
+  el('unresList').innerHTML = u.length
+    ? u.map(x => `<div class="dec"><span>${x.kind} · ${x.reason}<br><span class="ro">${x.path}${x.detail ? '<br>' + x.detail : ''}</span></span><b>${new Date(x.t*1000).toLocaleTimeString()}</b></div>`).join('')
+    : '<div class="empty">Sin errores pendientes.</div>';
+  drawMtChart();
+}
+function setBar(id, v){
+  const el = document.getElementById(id);
+  if (el) el.style.width = Math.max(0, Math.min(100, v || 0)) + '%';
+}
+let DJ = { filter: 'todo', q: '' };
+function kindLabel(k){ return k === 'sonda' ? 'sonda' : k === 'governor' ? 'gobernador' : k === 'freq' ? 'frecuencia' : k === 'scheduler' ? 'E/S' : k === 'perfil' ? 'perfil' : k === 'usuario' ? 'usuario' : k === 'blacklist' ? 'descartada' : k === 'incompatible' ? 'incompatible' : k; }
+function renderDiario(a){
+  const list = a.journal || [];
+  const q = DJ.q.toLowerCase();
+  const esDecision = e => ['perfil','governor','freq','scheduler','usuario'].indexOf(e.kind) >= 0;
+  const rows = list.filter(e => {
+    if (DJ.filter === 'decisiones') return esDecision(e);
+    if (DJ.filter === 'sondas') return e.kind === 'sonda' || (!e.ok && e.kind !== 'blacklist');
+    if (DJ.filter === 'alertas') return !e.ok || e.kind === 'blacklist' || e.kind === 'incompatible';
+    return true;
+  }).filter(e => {
+    if (!q) return true;
+    return (e.reason + ' ' + e.path + ' ' + e.app + ' ' + e.outcome + ' ' + (e.profile||'') + ' ' + (e.note||'')).toLowerCase().indexOf(q) >= 0;
+  });
+  document.getElementById('djCount').textContent = rows.length;
+  document.getElementById('djList').innerHTML = rows.length
+    ? rows.map(e => {
+        const t = new Date(e.t*1000);
+        const detalle = [e.path && e.path !== '-' ? e.path : '', e.value && e.value !== '-' ? '→ ' + e.value : ''].filter(Boolean).join(' ');
+        const efecto = [];
+        if (e.temp_d != null) efecto.push('temp ' + (e.temp_d > 0 ? '+' : '') + Number(e.temp_d).toFixed(1) + ' °C');
+        if (e.cpu_d != null && Math.abs(e.cpu_d) >= 0.5) efecto.push('cpu ' + (e.cpu_d > 0 ? '+' : '') + Number(e.cpu_d).toFixed(0) + ' %');
+        const out = String(e.outcome || '');
+        if (out && !/temp/i.test(out)) efecto.push(out);
+        return `<div class="dec"><span><b>${kindLabel(e.kind)}</b> · ${e.reason}<br><span class="ro">${detalle}${e.app ? ' · ' + e.app : ''} · confianza ${Math.round((e.conf || 0) * 100)} %</span>${efecto.length ? '<br><span class="ro">' + efecto.join(' · ') + '</span>' : ''}</span><b style="color:${e.ok ? 'var(--g1)' : 'var(--bad)'}">${e.ok ? 'medido' : 'fallo'}<br><span class="ro">${t.toLocaleTimeString()}</span></b></div>`;
+      }).join('')
+    : '<div class="empty">Sin entradas.</div>';
+}
+function drawMtChart(){
+  const c = document.getElementById('mtChart');
+  if (!c) return;
+  const dpr = window.devicePixelRatio || 1;
+  const w = c.clientWidth || 300, h = c.clientHeight || 96;
+  if (c.width !== Math.round(w*dpr)) { c.width = Math.round(w*dpr); c.height = Math.round(h*dpr); }
+  const ctx = c.getContext('2d');
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.clearRect(0,0,w,h);
+  const n = HIST.length;
+  if (n < 2) return;
+  const step = w/(n-1);
+  ctx.strokeStyle = '#10b981'; ctx.lineWidth = 2; ctx.beginPath();
+  HIST.forEach((s,i) => { const x=i*step, y=h-4-Math.min(1,s.cpu)*(h-10); i ? ctx.lineTo(x,y) : ctx.moveTo(x,y); });
+  ctx.stroke();
+  ctx.strokeStyle = '#f59e0b'; ctx.lineWidth = 2; ctx.beginPath();
+  HIST.forEach((s,i) => { const x=i*step, y=h-4-Math.min(1,(s.temp-30)/20)*(h-10); i ? ctx.lineTo(x,y) : ctx.moveTo(x,y); });
+  ctx.stroke();
+}
+
+$('#btnBackCtrl').onclick = () => {
+  $('#ctrlDetail').style.display = 'none';
+  $('#ctrlHome').style.display = 'block';
+};
+
+async function loadProcesses(){
+  const r = await j('/api/processes');
+  const list = r?.processes || [];
+  const el = document.getElementById('detBody');
+  if (!el) return;
+  el.innerHTML = list.length
+    ? list.map(p => `<div class="dec"><span>${p.name}<br><span class="ro">PID ${p.pid}</span></span><b>${p.cpu.toFixed(1)} %<br><span class="ro">${p.rss_mb.toFixed(0)} MB</span></b></div>`).join('')
+    : '<div class="empty">Sin procesos.</div>';
+}
+
+// Herramientas
+const btnSelftest = document.getElementById('btnSelftest');
+if (btnSelftest) btnSelftest.onclick = async () => {
+  if (!HAS_KSU) { toolLog('Autotest: ábrelo dentro de KernelSU.'); return; }
+  toolLog('ejecutando autotest…');
+  const out = window.ksu.exec(`${BIN} selftest --dir /data/local/tmp/iaopt_st`) || '';
+  toolLog(out.trim() || '(sin salida)');
+};
+const btnScan = document.getElementById('btnScan');
+if (btnScan) btnScan.onclick = async () => { await loadScan(); await refresh(); };
+const btnAiRun = document.getElementById('btnAiRun');
+if (btnAiRun) btnAiRun.onclick = async () => {
+  const aiLast = document.getElementById('aiLast');
+  if (aiLast) aiLast.textContent = 'Analizando…';
+  const r = await j('/api/ai/run', {method:'POST', body: '{}'});
+  if (aiLast) aiLast.textContent = r.changed
+    ? `${r.profile}: ${r.path} → ${r.value} (${r.applied ? 'verificado' : 'no sostenido'}) · satisfacción ${r.satisfaction_before} → ${r.satisfaction_after}`
+    : `Sin cambios (${r.reason || 'nada que hacer'})`;
+  log(`IA Motor: ${(aiLast||{}).textContent || ''}`);
+  loadAi();
+  refresh();
+};
+const aiSwEl = document.getElementById('aiSw');
+if (aiSwEl) aiSwEl.onclick = async () => {
+  const on = aiSwEl.classList.toggle('on');
+  await j('/api/ai/toggle', {method:'POST', body: JSON.stringify({enabled: on})});
+  log('IA automática ' + (on ? 'activada' : 'pausada'));
+  refresh();
+};
+const aiSwTop = document.getElementById('aiSwTop');
+if (aiSwTop) aiSwTop.onclick = async () => {
+  const on = !document.getElementById('aiSw').classList.contains('on');
+  document.getElementById('aiSw').classList.toggle('on', on);
+  await j('/api/ai/toggle', {method:'POST', body: JSON.stringify({enabled: on})});
+  log('IA automática ' + (on ? 'activada' : 'pausada'));
+  refresh();
+};
+
+// Game console
+
+// Reparación automática
+async function loadRepair(){
+  const repList = document.getElementById('repList');
+  if (!repList) return;
+  const r = await j('/api/repair');
+  if (!r || r.error) return;
+  const f = r.findings || [];
+  const bad = f.filter(x => !x.ok).length;
+  const repOk = document.getElementById('repOk');
+  if (repOk) { repOk.textContent = f.length ? (bad ? bad + ' por revisar' : 'todo en orden') : '—'; repOk.className = 'chip sm ' + (bad ? 'warn' : 'ok'); }
+  repList.innerHTML = f.length
+    ? f.map(x => `<div class="dec"><span>${x.name}<br><span class="ro">${x.detail}</span></span><b style="color:${x.ok ? 'var(--g1)' : 'var(--bad)'}">${x.ok ? 'OK' : 'fallo'}</b></div>`).join('') +
+      ((r.blacklist || []).length ? `<div class="empty">Descartadas: ${r.blacklist.join(', ')}</div>` : '')
+    : '<div class="empty">Sin diagnóstico.</div>';
+}
+const btnRepair = document.getElementById('btnRepair');
+if (btnRepair) btnRepair.onclick = async () => {
+  const r = await j('/api/repair');
+  const fixes = (r.findings || []).map(x => x.fix).filter(Boolean);
+  for (const fx of fixes) {
+    await j('/api/repair', {method:'POST', body: JSON.stringify({fix: fx})});
+  }
+  loadRepair();
+  refresh();
+};
+
+// Subpestanas de IA Motor: Resumen / Tweaks / Diario / Aprendizaje
+$$('#mtTabs .tbtn').forEach(b => b.onclick = () => {
+  $$('#mtTabs .tbtn').forEach(x => x.classList.toggle('on', x === b));
+  ['desc','tweaks','diario','aprend','energia','sistema'].forEach(k => {
+    const el = document.getElementById('mt-' + k);
+    if (el) el.style.display = b.dataset.mt === k ? 'block' : 'none';
+  });
+  if (b.dataset.mt === 'desc') { loadAgent(); drawMtChart(); }
+  if (b.dataset.mt === 'tweaks') { loadScan(); renderSections(); }
+  if (b.dataset.mt === 'diario') loadAgent();
+  if (b.dataset.mt === 'aprend') loadAgent();
+  if (b.dataset.mt === 'energia') { loadTelemetry(); loadBypass(); bindBypass(); }
+  if (b.dataset.mt === 'sistema') { refresh(); loadDevice(); loadRepair(); }
+});
+// Subpestanas de Ajustes: Pantalla / Registro / Acerca de
+$$('#setTabs .tbtn').forEach(b => b.onclick = () => {
+  $$('#setTabs .tbtn').forEach(x => x.classList.toggle('on', x === b));
+  ['pantalla','registro','acerca'].forEach(k => {
+    const el = document.getElementById('set-' + k);
+    if (el) el.style.display = b.dataset.set === k ? 'block' : 'none';
+  });
+  loadSettings(b.dataset.set);
+});
+function loadSettings(which){
+  which = which || (document.querySelector('#setTabs .tbtn.on') || {}).dataset?.set || 'pantalla';
+  if (which === 'pantalla') { loadDisplay(); loadRenderer(); loadAudio('audioProps'); }
+  if (which === 'registro') { loadAgent(); }
+  if (which === 'acerca') { const v = document.getElementById('setVersion'); if (v) v.textContent = 'v0.8.9'; }
+}
+const btnOpenDiario = document.getElementById('btnOpenDiario');
+if (btnOpenDiario) btnOpenDiario.onclick = () => {
+  $$('.tabbtn').forEach(x => x.classList.toggle('on', x.dataset.tab === 'tweaks'));
+  $$('.tab').forEach(t => t.classList.toggle('active', t.id === 'tab-tweaks'));
+  $$('#mtTabs .tbtn').forEach(x => x.classList.toggle('on', x.dataset.mt === 'diario'));
+  ['desc','tweaks','diario','aprend','energia','sistema'].forEach(k => {
+    const el = document.getElementById('mt-' + k);
+    if (el) el.style.display = k === 'diario' ? 'block' : 'none';
+  });
+  loadAgent();
+};
+
+// Diario: filtros y busqueda
+$$('#djFilters .modebtn').forEach(b => b.onclick = () => {
+  $$('#djFilters .modebtn').forEach(x => x.classList.toggle('on', x === b));
+  DJ.filter = b.dataset.f;
+  loadAgent();
+});
+const djSearch = document.getElementById('djSearch');
+if (djSearch) djSearch.oninput = e => {
+  clearTimeout(window.__djT);
+  window.__djT = setTimeout(() => { DJ.q = e.target.value; loadAgent(); }, 250);
+};
+// Topes
+$$('[data-cap]').forEach(b => b.onclick = async () => {
+  const r = await j('/api/profile', {method:'POST', body: JSON.stringify({profile: b.dataset.cap})});
+  log('tope ' + b.dataset.cap + ': ' + (r.applied || 0) + '/' + (r.total || 0));
+  refresh();
+  loadAgent();
+});
+
+// Centro de comando en vivo
+let CC_OPEN = false;
+function ccSetBar(id, txtId, v, txt){
+  const b = document.getElementById(id); if (b) b.style.width = Math.max(0, Math.min(100, v || 0)) + '%';
+  const t = document.getElementById(txtId); if (t) t.textContent = txt;
+}
+function ccLine(canvas, series, color, max){
+  const c = document.getElementById(canvas); if (!c) return;
+  const dpr = window.devicePixelRatio || 1;
+  const w = c.clientWidth || 300, h = c.clientHeight || 60;
+  if (c.width !== Math.round(w*dpr)) { c.width = Math.round(w*dpr); c.height = Math.round(h*dpr); }
+  const ctx = c.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0); ctx.clearRect(0,0,w,h);
+  const data = series || []; const n = data.length; if (n < 2) return;
+  let mx = max || 0; for (const v of data) if (v > mx) mx = v; if (mx <= 0) mx = 1;
+  ctx.strokeStyle = color; ctx.lineWidth = 1.6; ctx.beginPath();
+  data.forEach((v,i) => { const x = i/(n-1)*w, y = h-3-(v/mx)*(h-8); i ? ctx.lineTo(x,y) : ctx.moveTo(x,y); });
+  ctx.stroke();
+}
+async function loadCC(){
+  if (!CC_OPEN) return;
+  const d = await j('/api/command_center');
+  if (!d || d.error) return;
+  document.getElementById('ccPolicy').textContent = d.policy || 'policy0';
+  const v = d.vitals || {};
+  ccSetBar('ccCpu','ccCpuT', v.cpu, (v.cpu || 0).toFixed(0) + ' %');
+  ccSetBar('ccBat','ccBatT', v.battery, (v.battery || 0).toFixed(0) + ' %');
+  ccSetBar('ccRam','ccRamT', v.ram, (v.ram || 0).toFixed(0) + ' %');
+  ccSetBar('ccTemp','ccTempT', Math.max(0, (v.temp_c - 25) / 25 * 100), (v.temp_c || 0).toFixed(1) + ' °C');
+  ccLine('ccTrend', v.trend || [40], '#f59e0b', 60);
+  const tp = d.thermal_prediction || [];
+  ccLine('ccTherm', tp.map(x => x.predicted), '#22d3ee', 80);
+  ccLine('ccTherm', tp.map(x => x.actual), '#f59e0b', 80);
+  const errs = d.prediction_error || [];
+  ccLine('ccErr', errs, '#f87171', 0.01);
+  const es = d.error_summary || {};
+  const tag = document.getElementById('ccErrTag');
+  if (tag) { tag.textContent = es.verdict || '—'; tag.className = 'badge ' + (es.verdict === 'Convergiendo' ? '' : 'warn'); }
+  document.getElementById('ccErrSum').textContent = (es.first != null ? es.first : 0).toFixed(3) + ' -> ' + (es.last != null ? es.last : 0).toFixed(3) + ' a través de ' + (es.loops || 0) + ' bucles';
+  const k = d.knowledge || {};
+  const kt = Math.max(1, k.total || 1);
+  ccSetBar('ccInc','ccIncT', (k.inciertos || 0)/kt*100, (k.inciertos || 0) + ' de ' + kt);
+  ccSetBar('ccUtil','ccUtilT', (k.utiles || 0)/kt*100, (k.utiles || 0) + ' de ' + kt);
+  document.getElementById('ccKnow').innerHTML = (k.cards || []).map(c =>
+    `<div class="ccrow"><span>${c.policy}<br><span class="ro">${c.samples} muestras · epistémicas ${c.epistemic.toFixed(3)} · valor info ${c.info_value.toFixed(3)}</span></span><span class="badge ${c.state === 'Util conocido' ? '' : 'warn'}">${c.state}</span></div>`).join('');
+  const g = d.exploration_gate || {};
+  document.getElementById('ccGate').textContent = g.text || '—';
+  document.getElementById('ccProbes').textContent = (g.probes_used || 0) + ' de ' + (g.probes_limit || 0) + ' sondas utilizadas en esta sesión';
+  const cp = d.control_plan || {};
+  document.getElementById('ccCover').textContent = (cp.coverage_pct || 0) + ' %';
+  document.getElementById('ccNext').textContent = cp.next_action || '—';
+  const la = d.loop_audit || {};
+  const keys = ['mejorado','regresado','seguridad','desviacion','anulaciones','veredictos','sondas'];
+  const ids = ['ccMejorado','ccRegresado','ccSeguridad','ccDesviacion','ccAnulaciones','ccVeredictos','ccSondas'];
+  ids.forEach((id, i) => { const el = document.getElementById(id); if (el) el.textContent = la[keys[i]] != null ? la[keys[i]] : 0; });
+  document.getElementById('ccOwners').innerHTML = (d.ownership || []).map(o =>
+    `<div class="ccrow"><span>${o.node}<br><span class="ro">propietario ${o.owner} · intención ${o.intent}</span></span><span class="badge">${o.state}</span></div>`).join('') || '<div class="empty">Sin controles.</div>';
+}
+const btnOpenCC = document.getElementById('btnOpenCC');
+if (btnOpenCC) btnOpenCC.onclick = () => { CC_OPEN = true; document.getElementById('ccModal').classList.add('open'); loadCC(); };
+const ccClose = document.getElementById('ccClose');
+if (ccClose) ccClose.onclick = () => { CC_OPEN = false; document.getElementById('ccModal').classList.remove('open'); };
+const btnEvaluate = document.getElementById('btnEvaluate');
+if (btnEvaluate) btnEvaluate.onclick = async () => {
+  const r = await j('/api/evaluate');
+  const box = document.getElementById('ccEval');
+  if (box) box.innerHTML = '<div class="empty">' + (r.checks || []).map(c => `${c.ok ? '✓' : '✗'} ${c.name}: ${c.detail}`).join('<br>') + '</div>';
+};
+setInterval(() => { if (CC_OPEN) loadCC(); }, 1500);
+
+// Game Space y Apps
+let GS_OPEN = false, HUD_OPEN = false, GAMES = [], APPS = [], APP = null;
+let APP_FILTER = 'all', APP_Q = '';
+function profLabel(p){ return p === 'eco' ? 'Batería' : p === 'balanced' ? 'Equilibrado' : 'Rendimiento'; }
+function profOptions(cur){
+  return ['eco','balanced','performance'].map(p =>
+    `<option value="${p}" ${cur === p ? 'selected' : ''}>${profLabel(p)}</option>`).join('');
+}
+// --- Lista vertical de aplicaciones ---
+async function loadApps(){
+  const d = await j('/api/apps?filter=' + APP_FILTER);
+  APPS = (d && d.apps) || [];
+  renderAppList();
+  gsStatus();
+}
+function renderAppList(){
+  const q = APP_Q.toLowerCase();
+  const list = APPS.filter(a => !q || (a.name || '').toLowerCase().includes(q) || (a.package || '').toLowerCase().includes(q));
+  const el = document.getElementById('appList');
+  if (!el) return;
+  el.innerHTML = list.length ? list.map(a => `
+    <div class="approw" data-pkg="${a.package}">
+      <div class="gsicon sm appicon"><span>${(a.name || '?').slice(0, 1)}</span><img src="/api/app-icon?package=${encodeURIComponent(a.package)}" alt="" onerror="this.remove()"></div>
+      <div class="appmeta"><b>${a.name}</b><span>${a.package} · ${a.size_mb} MB${a.system ? ' · Sistema' : ''}</span></div>
+      <div class="apstatus">${a.is_game ? '<span class="badge warn">Juego</span>' : ''}<span class="ap-chev">›</span></div>
+    </div>`).join('') : '<div class="empty">Sin aplicaciones.</div>';
+}
+// --- Game Space: solo apps marcadas como juego ---
+async function loadGames(){
+  const d = await j('/api/games');
+  GAMES = (d && d.games) || [];
+  const car = document.getElementById('gsCarousel');
+  if (car) {
+    car.innerHTML = GAMES.length ? GAMES.map((g, i) => `
+      <div class="gscard ${i === 0 ? 'sel' : ''}">
+        <div class="gsicon">${(g.name || '?').slice(0, 1)}</div>
+        <div class="gsname">${g.name}</div>
+        <div class="gsmeta">${g.size_mb} MB · ${g.installed || '—'} · Juego</div>
+        <button class="gsstart" data-start="${g.package}">▶ Iniciar juego</button>
+        <div class="gsrow">
+          <select data-prof="${g.package}">${profOptions(g.profile || 'balanced')}</select>
+          <button data-hud="${g.package}">Panel lateral</button>
+        </div>
+      </div>`).join('') : '<div class="empty">Todavía no hay juegos marcados. Activa el interruptor "Es un juego" en el panel de una app.</div>';
+  }
+  const dots = document.getElementById('gsDots');
+  if (dots) dots.innerHTML = GAMES.map((g, i) => `<i class="${i === 0 ? 'on' : ''}"></i>`).join('');
+  const prof = document.getElementById('gsProfiles');
+  if (prof) prof.innerHTML = GAMES.length ? GAMES.map(g =>
+    `<div class="dec"><span>${g.name}</span><select data-prof="${g.package}">${profOptions(g.profile || 'balanced')}</select></div>`).join('')
+    : '<div class="empty">Sin juegos marcados.</div>';
+  const q = document.getElementById('gsQuick');
+  if (q) q.innerHTML = ['wifi_on','data_on','hz','dnd_on','info','log','fps','crosshair'].map(a =>
+    `<button class="hudtg" data-quick="${a}" ${a === 'hz' ? 'data-value="120"' : ''}>${a === 'wifi_on' ? '📶 Wifi' : a === 'data_on' ? '📱 Datos' : a === 'hz' ? '🔁 120 Hz' : a === 'dnd_on' ? '🔕 No molestar' : a === 'info' ? 'ℹ️ Sistema' : a === 'log' ? '🧾 Registro' : a === 'fps' ? '📊 FPS' : '🎯 Crosshair'}</button>`).join('');
+  gsStatus();
+}
+async function gsStatus(){
+  const d = await j('/api/hud');
+  if (!d || d.error) return;
+  const b = document.getElementById('gsBat');
+  const t = document.getElementById('gsTemp');
+  const r = document.getElementById('gsRam');
+  if (b) b.textContent = 'Batería ' + d.battery_pct + ' %';
+  if (t) t.textContent = d.temp_c + ' °C';
+  if (r) r.textContent = 'RAM ' + d.ram_gb.toFixed(1) + ' GB';
+}
+function switchGs(which){
+  document.querySelectorAll('#gsTabs .tbtn').forEach(b => b.classList.toggle('on', b.dataset.gs === which));
+  const apps = document.getElementById('gs-apps'); if (apps) apps.style.display = which === 'apps' ? 'block' : 'none';
+  const games = document.getElementById('gs-games'); if (games) games.style.display = which === 'games' ? 'block' : 'none';
+  const ctrl = document.getElementById('gs-control'); if (ctrl) ctrl.style.display = which === 'control' ? 'block' : 'none';
+  if (which === 'apps') loadApps();
+  if (which === 'games') loadGames();
+}
+// --- HUD flotante ---
+function openHud(pkg){
+  HUD_OPEN = true;
+  const g = document.getElementById('hudGame');
+  if (g && pkg) g.textContent = '▶ ' + pkg;
+  document.getElementById('hudModal').classList.add('open');
+  loadHud();
+}
+function closeHud(){
+  HUD_OPEN = false;
+  document.getElementById('hudModal').classList.remove('open');
+}
+async function loadHud(){
+  if (!HUD_OPEN) return;
+  const d = await j('/api/hud');
+  if (!d || d.error) return;
+  const cpu = document.getElementById('hudCpuGhz'); if (cpu) cpu.textContent = d.cpu_ghz.toFixed(2);
+  const gpu = document.getElementById('hudGpuMhz'); if (gpu) gpu.textContent = d.gpu_mhz;
+  const ringC = document.getElementById('ringCpu');
+  if (ringC) ringC.style.background = `conic-gradient(var(--g1) ${Math.min(360, d.cpu_pct * 3.6)}deg, var(--card2) 0)`;
+  const ringG = document.getElementById('ringGpu');
+  if (ringG) ringG.style.background = 'conic-gradient(var(--g2) 40deg, var(--card2) 0)';
+  const bat = document.getElementById('hudBat');
+  if (bat) bat.textContent = d.battery_pct + ' % · ' + d.temp_c + ' °C';
+  gsStatus();
+}
+// --- Panel de ajustes por aplicacion ---
+function cpuPresets(){
+  const k = SCAN.find(x => x.path.endsWith('scaling_max_freq') && x.writable);
+  if (k && k.max) {
+    const hi = parseInt(k.max, 10);
+    const vals = [hi, Math.round(hi*0.85), Math.round(hi*0.7), Math.round(hi*0.55)];
+    return [...new Set(vals)].map(v => String(v));
+  }
+  return ['2000000','1700000','1400000','1000000'];
+}
+function ioPresets(){
+  const k = SCAN.find(x => x.path.includes('queue/scheduler') && x.writable && x.allowed.length);
+  const vals = k ? k.allowed.filter(a => a !== '[noop]') : ['none','noop','cfq','bfq','mq-deadline','kyber'];
+  return [...new Set(vals)];
+}
+function fmtPerf(p){ return p === 'light' ? 'Ligero' : p === 'balanced' ? 'Equilibrado' : p === 'performance' ? 'Rendimiento' : 'Predeterminado'; }
+function fmtBypass(b){ return b === 'off' ? 'Desactivado' : b === 'on' ? 'Forzado' : 'Predeterminado'; }
+function fmtPreload(p){ return p === 'on' ? 'Activado' : 'Predeterminado'; }
+function fmtHz(hz){ return hz ? hz + ' Hz' : 'Predeterminado'; }
+function fmtFps(f){ return f ? f + ' fps' : '60 fps'; }
+function openApp(pkg){
+  const a = APPS.find(x => x.package === pkg);
+  if (!a) return;
+  APP = a;
+  const iconLetter = document.getElementById('apIconLetter'); if (iconLetter) iconLetter.textContent = (a.name || '?').slice(0, 1);
+  const iconImg = document.getElementById('apIconImg'); if (iconImg) iconImg.src = '/api/app-icon?package=' + encodeURIComponent(a.package);
+  document.getElementById('apName').textContent = a.name;
+  document.getElementById('apPkg').textContent = a.package + ' · ' + a.size_mb + ' MB';
+  loadAppInfo(a.package);
+  document.getElementById('apGame').classList.toggle('on', !!a.is_game);
+  document.getElementById('apPerf').textContent = fmtPerf(a.perf || '');
+  document.getElementById('apBypass').textContent = fmtBypass(a.bypass || '');
+  document.getElementById('apPreload').textContent = fmtPreload(a.preload || '');
+  document.getElementById('apHz').textContent = fmtHz(a.hz || 0);
+  document.getElementById('apFps').textContent = fmtFps(a.fps || '');
+  loadRendererForApp();
+  loadDisplayForApp();
+  document.getElementById('appModal').classList.add('open');
+}
+function closeApp(){ document.getElementById('appModal').classList.remove('open'); APP = null; }
+async function loadAppInfo(pkg){
+  const d = await j('/api/app-info?package=' + encodeURIComponent(pkg));
+  const el = document.getElementById('apPkg');
+  if (el && d && d.version) el.textContent = pkg + ' · ' + d.version;
+}
+async function loadRendererForApp(){
+  const d = await j('/api/renderer');
+  const el = document.getElementById('apRenderer');
+  if (el) el.textContent = (d && d.current) ? d.current : 'Predeterminado';
+}
+async function loadDisplayForApp(){
+  const d = await j('/api/display');
+  const el = document.getElementById('apRes');
+  if (!el) return;
+  const size = d && d.size ? String(d.size) : '';
+  const m = size.match(/Override size:\s*([0-9x]+)/i);
+  el.textContent = m ? m[1] : 'Predeterminado';
+}
+// --- Selector de opcion (hoja inferior, estilo AZenith) ---
+const CHOOSERS = {
+  perf: { title: 'Modo de rendimiento ligero', options: [ ['','Predeterminado'], ['light','Ligero'], ['balanced','Equilibrado'], ['performance','Rendimiento'] ] },
+  bypass: { title: 'Carga por bypass', options: [ ['','Predeterminado'], ['off','Desactivado'], ['on','Forzado'] ] },
+  preload: { title: 'Precarga del juego', options: [ ['','Predeterminado'], ['on','Activado'] ] },
+  hz: { title: 'Tasa de refresco', options: [ ['0','Predeterminado'], ['60','60 Hz'], ['90','90 Hz'], ['120','120 Hz'] ] },
+  fps: { title: 'Tasa de fotogramas objetivo', options: [ ['','60 fps'], ['60','60 fps'], ['90','90 fps'], ['120','120 fps'] ] },
+  renderer: { title: 'Motor de renderizado', options: [] },
+  resolution: { title: 'Reducir resolución', options: [ ['default','Predeterminado'], ['720x1520','720p'], ['720x1600','720p'], ['1080x2280','1080p'], ['1080x2400','1080p'] ] },
+};
+function currentChoice(key){
+  if (!APP) return '';
+  if (key === 'perf') return APP.perf || '';
+  if (key === 'bypass') return APP.bypass || '';
+  if (key === 'preload') return APP.preload || '';
+  if (key === 'hz') return String(APP.hz || 0);
+  if (key === 'fps') return APP.fps || '';
+  return '';
+}
+function openChooser(key){
+  const c = CHOOSERS[key];
+  if (!c) return;
+  if (key === 'renderer') {
+    j('/api/renderer').then(d => {
+      const list = (d && d.options) ? d.options.map(o => [o.name, o.name]) : [];
+      renderChooser(key, [['','Predeterminado']].concat(list));
+    });
+    return;
+  }
+  renderChooser(key, c.options);
+}
+function renderChooser(key, opts){
+  const c = CHOOSERS[key];
+  document.getElementById('chooseTitle').textContent = c.title;
+  const cur = String(currentChoice(key));
+  const list = document.getElementById('chooseList');
+  list.innerHTML = opts.map(([v, label]) => `<button class="choose-opt ${cur === String(v) ? 'on' : ''}" data-cv="${v}"><span>${label}</span>${cur === String(v) ? '<span class="tick">✓</span>' : ''}</button>`).join('');
+  list.querySelectorAll('.choose-opt').forEach(b => b.onclick = () => pickChoice(key, b.dataset.cv));
+  document.getElementById('chooseModal').classList.add('open');
+}
+function closeChooser(){ document.getElementById('chooseModal').classList.remove('open'); }
+async function pickChoice(key, value){
+  closeChooser();
+  if (!APP) return;
+  if (key === 'renderer') {
+    const r = await j('/api/renderer', {method:'POST', body: JSON.stringify({value})});
+    log('motor de renderizado: ' + (r.detail || (r.ok ? 'ok' : 'fallo')));
+    loadRendererForApp();
+    return;
+  }
+  if (key === 'resolution') {
+    const r = await j('/api/resolution', {method:'POST', body: JSON.stringify({value})});
+    log('resolución: ' + (r.detail || (r.ok ? 'ok' : 'fallo')));
+    loadDisplayForApp();
+    return;
+  }
+  if (key === 'perf') {
+    await saveSetting('perf', value);
+    const k = SCAN.find(x => x.path.endsWith('scaling_max_freq') && x.max);
+    const hi = k ? parseInt(k.max, 10) : 2000000;
+    const g = SCAN.find(x => x.domain === 'gpu' && x.path.endsWith('max_freq') && x.max);
+    const ghi = g ? parseInt(g.max, 10) : 1000000000;
+    const ratio = value === 'light' ? 0.55 : value === 'balanced' ? 0.85 : value === 'performance' ? 1 : 0;
+    await saveSetting('mode', ratio ? 'manual' : 'auto');
+    await saveSetting('cpu_max', ratio ? String(Math.round(hi * ratio)) : '');
+    await saveSetting('gpu_max', ratio ? String(Math.round(ghi * ratio)) : '');
+    openApp(APP.package);
+    return;
+  }
+  await saveSetting(key, value);
+  openApp(APP.package);
+}
+async function saveSetting(key, value){
+  if (!APP) return;
+  const r = await j('/api/app-settings', {method:'POST', body: JSON.stringify({package: APP.package, key, value})});
+  if (key === 'is_game') APP.is_game = (value === 'true');
+  else if (key === 'hz') APP.hz = parseInt(value, 10);
+  else APP[key] = value;
+  log('app ' + APP.name + ': ' + (r.detail || (r.ok ? 'ok' : 'fallo')));
+  if (key === 'is_game') document.getElementById('apGame').classList.toggle('on', value === 'true');
+}
+async function quickToggle(el){
+  const action = el.dataset.quick;
+  const value = el.dataset.value || '';
+  if (action === 'info' || action === 'log' || action === 'fps') {
+    const g = document.getElementById('hudGame');
+    if (g) g.textContent = action === 'info' ? ('Sistema: ' + (document.querySelector('#gsRam') || {}).textContent) : (action === 'log' ? 'Registro: diario de IA Motors' : 'FPS: disponible en la versión 0.8.8');
+    return;
+  }
+  const r = await j('/api/quick', { action, value });
+  el.classList.toggle('on', !!(r && r.ok) && (action.endsWith('_on') || action === 'hz' || action === 'crosshair'));
+}
+document.addEventListener('click', async e => {
+  const ch = e.target.closest('[data-choose]');
+  if (ch) { openChooser(ch.dataset.choose); return; }
+  const st = e.target.closest('[data-start]');
+  if (st) { await j('/api/launch', { package: st.dataset.start }); return; }
+  const h = e.target.closest('[data-hud]');
+  if (h) { openHud(h.dataset.hud); return; }
+  const t = e.target.closest('[data-quick]');
+  if (t) { quickToggle(t); return; }
+  const m = e.target.closest('[data-hudprof]');
+  if (m) {
+    const box = m.closest('.modes');
+    box.querySelectorAll('.modebtn').forEach(b => b.classList.toggle('on', b === m));
+    return;
+  }
+  const gs = e.target.closest('[data-gs]');
+  if (gs) { switchGs(gs.dataset.gs); return; }
+  const af = e.target.closest('[data-af]');
+  if (af) {
+    APP_FILTER = af.dataset.af;
+    document.querySelectorAll('#appFilters .modebtn').forEach(b => b.classList.toggle('on', b === af));
+    loadApps();
+    return;
+  }
+  const row = e.target.closest('.approw');
+  if (row) { openApp(row.dataset.pkg); return; }
+});
+document.addEventListener('change', async e => {
+  const sel = e.target.closest('[data-prof]');
+  if (sel) await j('/api/app-settings', {method:'POST', body: JSON.stringify({package: sel.dataset.prof, key: 'mode', value: 'manual'})});
+});
+document.addEventListener('input', async e => {
+  const s = e.target.closest('#appSearch');
+  if (s) { APP_Q = s.value || ''; renderAppList(); }
+});
+const btnHud = document.getElementById('btnHud');
+if (btnHud) btnHud.onclick = () => openHud('');
+const btnOpenGs = document.getElementById('btnOpenGs');
+if (btnOpenGs) btnOpenGs.onclick = () => switchGs('games');
+const apClose = document.getElementById('apClose');
+if (apClose) apClose.onclick = closeApp;
+const apGame = document.getElementById('apGame');
+if (apGame) apGame.onclick = () => { if (APP) saveSetting('is_game', APP.is_game ? 'false' : 'true'); };
+const apApply = document.getElementById('apApply');
+if (apApply) apApply.onclick = async () => {
+  if (!APP) return;
+  const r = await j('/api/app-apply', {method:'POST', body: JSON.stringify({package: APP.package})});
+  log('aplicar ' + APP.name + ': ' + (r.detail || (r.ok ? 'ok' : 'fallo')));
+};
+const apShare = document.getElementById('apShare');
+if (apShare) apShare.onclick = () => {
+  if (!APP) return;
+  const txt = APP.name + ' (' + APP.package + ') · ' + fmtPerf(APP.perf || '') + ' · ' + fmtHz(APP.hz || 0);
+  try { navigator.share({title: APP.name, text: txt}); } catch (e) { log(txt); }
+};
+const apInfo = document.getElementById('apInfo');
+if (apInfo) apInfo.onclick = () => {
+  if (!APP) return;
+  log('Paquete: ' + APP.package + '\nTamaño: ' + APP.size_mb + ' MB' + (APP.installed ? '\nInstalada: ' + APP.installed : '') + '\nJuego: ' + (APP.is_game ? 'sí' : 'no'));
+};
+const chooseClose = document.getElementById('chooseClose');
+if (chooseClose) chooseClose.onclick = closeChooser;
+const hudClose = document.getElementById('hudClose');
+if (hudClose) hudClose.onclick = closeHud;
+setInterval(() => { if (HUD_OPEN) loadHud(); }, 1500);
+
+// Arranque
+const setT0 = document.getElementById('setTransport');
+if (setT0) setT0.textContent = HAS_KSU ? 'KernelSU (root)' : 'HTTP 127.0.0.1:8080';
+const setV = document.getElementById('setVersion');
+if (setV) setV.textContent = 'v0.8.9';
+loadAi();
+loadRepair();
+loadDevice();
+loadAgent();
+renderSections();
+loadTelemetry();
+refresh();
+loadScan();
+setInterval(refresh, 3000);
+setInterval(loadAi, 15000);
+setInterval(loadRepair, 20000);
+setInterval(loadTelemetry, 5000);
+setInterval(loadAgent, 12000);
+setInterval(loadDevice, 30000);
+</script>
+</body>
+</html>

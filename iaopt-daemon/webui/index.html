@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IA Optimizer · TeyZen</title>
+<style>
+  :root{--bg:#0d1117;--card:#161b22;--bd:#2b333c;--tx:#e6edf3;--mut:#8b949e;--ac:#3fb950;--warn:#d29922;--bad:#f85149}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--tx);font:14px/1.5 system-ui,sans-serif;padding:16px;max-width:900px;margin-inline:auto}
+  h1{font-size:20px;margin:0 0 4px} .sub{color:var(--mut);margin-bottom:16px;font-size:12px}
+  .grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+  .card{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:14px}
+  .card h2{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--mut);margin:0 0 8px}
+  .big{font-size:26px;font-weight:600}
+  .pill{display:inline-block;padding:2px 8px;border-radius:99px;border:1px solid var(--bd);font-size:11px;color:var(--mut)}
+  .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+  button{flex:1;min-width:90px;padding:9px 10px;border-radius:8px;border:1px solid var(--bd);background:#21262d;color:var(--tx);cursor:pointer;font-size:13px}
+  button:hover{border-color:var(--ac)} button.on{background:rgba(63,185,80,.15);border-color:var(--ac);color:var(--ac)}
+  label{font-size:12px;color:var(--mut);display:flex;justify-content:space-between;margin-top:8px}
+  input,select{width:100%;padding:7px;border-radius:7px;border:1px solid var(--bd);background:#0d1117;color:var(--tx);margin-top:4px}
+  table{width:100%;border-collapse:collapse;font-size:12px;margin-top:6px}
+  td,th{text-align:left;padding:5px 6px;border-bottom:1px solid var(--bd);vertical-align:top}
+  th{color:var(--mut);font-weight:500}
+  code{color:var(--ac);word-break:break-all}
+  .ok{color:var(--ac)} .ro{color:var(--mut)}
+  #log{font-family:monospace;font-size:11px;color:var(--mut);white-space:pre-wrap;max-height:140px;overflow:auto}
+</style>
+</head>
+<body>
+<h1>IA Optimizer</h1>
+<div class="sub">by TeyZen · <span id="transport">conectando…</span> · <span id="knobs">–</span> controles detectados</div>
+
+<div class="grid">
+  <div class="card"><h2>Perfil activo</h2><div class="big" id="profile">–</div><span class="pill" id="auto">auto</span></div>
+  <div class="card"><h2>Sugerencia del motor</h2><div class="big" id="sug" style="font-size:18px">–</div><div class="sub" id="reason"></div></div>
+  <div class="card"><h2>Telemetría</h2><div class="big" id="load">–</div><div class="sub"><span id="temp">–</span> · <span id="chg">–</span></div></div>
+</div>
+
+<div class="card" style="margin-top:12px">
+  <h2>Perfiles</h2>
+  <div class="row">
+    <button data-p="performance">Rendimiento</button>
+    <button data-p="balanced">Balanceado</button>
+    <button data-p="eco">ECO</button>
+  </div>
+  <label>Modo automático del motor <input type="checkbox" id="autoT" style="width:auto;margin:0"></label>
+  <label>Simular juego en primer plano <input type="checkbox" id="gameT" style="width:auto;margin:0"></label>
+  <div id="log"></div>
+</div>
+
+<div class="card" style="margin-top:12px">
+  <h2>Controles del kernel detectados</h2>
+  <table><thead><tr><th>Dominio</th><th>Ruta</th><th>Valor</th><th></th></tr></thead><tbody id="knobRows"></tbody></table>
+</div>
+
+<script>
+const $ = s => document.querySelector(s);
+const HAS_KSU = !!(window.ksu && typeof ksu.exec === 'function');
+const BIN = '/data/adb/modules/ia_optimizer/bin/iaopt';
+const DAEMON = 'http://127.0.0.1:8080';
+const shq = s => "'" + String(s).replace(/'/g, "'\\''") + "'";
+
+// Una sola funcion para todos los transports:
+//  - Dentro de KernelSU/MMRL: ksu.exec (root) hacia el binario del modulo.
+//  - En navegador: HTTP al demonio local.
+async function j(url, opt){
+  if (HAS_KSU) {
+    const body = opt && opt.body ? JSON.parse(opt.body) : null;
+    let cmd = null;
+    if (url === '/api/state') cmd = `${BIN} state`;
+    else if (url === '/api/scan') cmd = `${BIN} scan-json`;
+    else if (url === '/api/profile') cmd = `${BIN} apply ${shq(body.profile)}`;
+    else if (url === '/api/auto') cmd = `${BIN} set-auto ${body.enabled ? 1 : 0}`;
+    else if (url === '/api/gaming') cmd = `${BIN} set-gaming ${body.enabled ? 1 : 0}`;
+    else if (url === '/api/knob') cmd = `${BIN} set-knob ${shq(body.path)} ${shq(body.value)}`;
+    if (!cmd) return {};
+    const out = window.ksu.exec(cmd) || '';
+    try { return JSON.parse(out); } catch(e) { return {error: out}; }
+  }
+  const base = location.host.endsWith(':8080') ? '' : DAEMON;
+  const r = await fetch(base + url, opt);
+  return r.json().catch(()=> ({}));
+}
+function log(m){ const t=new Date().toLocaleTimeString(); $('#log').textContent += `[${t}] ${m}\n`; $('#log').scrollTop = 1e9; }
+$('#transport').textContent = HAS_KSU ? 'KernelSU (root)' : 'HTTP 127.0.0.1:8080';
+
+async function refresh(){
+  const s = await j('/api/state');
+  $('#profile').textContent = s.profile || '?';
+  $('#auto').textContent = s.auto ? 'automático' : 'manual';
+  $('#autoT').checked = !!s.auto;
+  $('#gameT').checked = !!s.gaming;
+  $('#sug').textContent = s.suggestion ? s.suggestion.profile : '–';
+  $('#reason').textContent = s.suggestion ? `${s.suggestion.reason} (${(s.suggestion.confidence*100).toFixed(0)}%)` : '';
+  $('#knobs').textContent = s.knobs ?? '–';
+  if(s.metrics){ $('#load').textContent = (s.metrics.cpu_load*100).toFixed(0)+'%';
+    $('#temp').textContent = s.metrics.battery_temp_c.toFixed(1)+' °C';
+    $('#chg').textContent = s.metrics.charging ? 'cargando' : 'con batería'; }
+  const kn = await j('/api/scan');
+  $('#knobRows').innerHTML = kn.map(k =>
+    `<tr><td>${k.domain}</td><td><code>${k.path}</code></td>`+
+    `<td>${k.current}${k.allowed.length? ' <span class="ro">['+k.allowed.join(', ')+']</span>':''}</td>`+
+    `<td>${k.writable? `<button data-path="${k.path}" data-cur="${k.current}">Aplicar</button>`:'<span class="ro">solo lectura</span>'}</td></tr>`).join('');
+}
+
+document.querySelectorAll('button[data-p]').forEach(b => b.onclick = async () => {
+  const r = await j('/api/profile', {method:'POST', body: JSON.stringify({profile:b.dataset.p})});
+  log(`perfil ${b.dataset.p}: ${r.applied}/${r.total} cambios aplicados`);
+  refresh();
+});
+$('#autoT').onchange = async e => { await j('/api/auto',{method:'POST',body:JSON.stringify({enabled:e.target.checked})}); log('modo auto '+e.target.checked); };
+$('#gameT').onchange = async e => { await j('/api/gaming',{method:'POST',body:JSON.stringify({enabled:e.target.checked})}); log('juego '+e.target.checked); };
+$('#knobRows').onclick = async e => {
+  const b = e.target.closest('button[data-path]'); if(!b) return;
+  const value = prompt(`Nuevo valor para ${b.dataset.path}`, b.dataset.cur);
+  if(value === null) return;
+  const r = await j('/api/knob', {method:'POST', body: JSON.stringify({path:b.dataset.path, value})});
+  log(`${r.ok? 'ok':'fallo'} ${r.path} -> ${r.after||'?'} (${r.note})`);
+  refresh();
+};
+refresh(); setInterval(refresh, 3000);
+</script>
+</body>
+</html>

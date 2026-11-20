@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <style name="Theme.IAOptimizer" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primary_dark</item>
+        <item name="colorOnPrimary">@color/on_primary</item>
+        <item name="colorSecondary">@color/secondary</item>
+        <item name="colorOnSecondary">@color/on_primary</item>
+        <item name="android:colorBackground">@color/bg</item>
+        <item name="colorSurface">@color/surface</item>
+        <item name="colorOnSurface">@color/on_surface</item>
+        <item name="colorSurfaceVariant">@color/surface_variant</item>
+        <item name="colorOnSurfaceVariant">@color/on_surface_variant</item>
+        <item name="colorOutline">@color/outline</item>
+        <item name="colorError">@color/error</item>
+        <item name="android:statusBarColor">@color/bg</item>
+        <item name="android:navigationBarColor">@color/bg</item>
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
+
+    <style name="Card" parent="Widget.Material3.CardView.Elevated">
+        <item name="cardBackgroundColor">@color/surface</item>
+        <item name="cardCornerRadius">18dp</item>
+        <item name="cardElevation">0dp</item>
+        <item name="strokeColor">@color/outline</item>
+        <item name="strokeWidth">1dp</item>
+        <item name="contentPadding">16dp</item>
+    </style>
+
+    <style name="PillButton" parent="Widget.Material3.Button.TonalButton">
+        <item name="android:textColor">@color/on_surface_variant</item>
+        <item name="backgroundTint">@color/surface_variant</item>
+        <item name="cornerRadius">14dp</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+
+    <!-- Botones de modo de energia: el seleccionado queda evidente. -->
+    <style name="ProfileButton" parent="Widget.Material3.Button">
+        <item name="android:textColor">@color/profile_text</item>
+        <item name="backgroundTint">@color/profile_tint</item>
+        <item name="cornerRadius">14dp</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="strokeWidth">0dp</item>
+        <item name="elevation">0dp</item>
+        <item name="rippleColor">#33FFFFFF</item>
+    </style>
+
+    <!-- Tarjeta plana con fondo semitransparente y borde cian tenue -->
+    <style name="CardFlat">
+        <item name="android:background">@drawable/bg_card</item>
+        <item name="android:padding">@dimen/space_lg</item>
+    </style>
+
+    <style name="SectionTitle">
+        <item name="android:textColor">@color/primary</item>
+        <item name="android:textSize">@dimen/text_label</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:letterSpacing">0.08</item>
+        <item name="android:textAllCaps">true</item>
+    </style>
+
+    <style name="CardTitle">
+        <item name="android:textColor">@color/text</item>
+        <item name="android:textSize">@dimen/text_body</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="CardValue">
+        <item name="android:textColor">@color/primary</item>
+        <item name="android:textSize">@dimen/text_body</item>
+    </style>
+
+    <!-- Valores en vivo: monoespaciados para que no salten al cambiar. -->
+    <style name="LiveValue">
+        <item name="android:fontFamily">monospace</item>
+        <item name="android:textColor">@color/text</item>
+        <item name="android:textSize">@dimen/text_title</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="LiveValueSmall">
+        <item name="android:fontFamily">monospace</item>
+        <item name="android:textColor">@color/text</item>
+        <item name="android:textSize">@dimen/text_caption</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="CardHint">
+        <item name="android:textColor">@color/text_dim</item>
+        <item name="android:textSize">@dimen/text_caption</item>
+    </style>
+
+    <style name="ControlLabel">
+        <item name="android:textColor">@color/text</item>
+        <item name="android:textSize">@dimen/text_body</item>
+    </style>
+
+    <style name="Widget.IAOptimizer.Slider" parent="Widget.Material3.Slider">
+        <item name="trackColorActive">@color/primary</item>
+        <item name="trackColorInactive">@color/surface_high</item>
+        <item name="thumbColor">@color/primary</item>
+        <item name="tickColorInactive">@color/outline</item>
+        <item name="labelStyle">@style/Widget.IAOptimizer.Slider.Label</item>
+    </style>
+
+    <style name="Widget.IAOptimizer.Slider.Label" parent="Widget.Material3.Tooltip">
+        <item name="android:textColor">@color/on_primary</item>
+        <item name="backgroundTint">@color/primary_dark</item>
+    </style>
+
+    <style name="Widget.IAOptimizer.Spinner" parent="Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
+        <item name="boxStrokeColor">@color/primary</item>
+        <item name="hintTextColor">@color/primary</item>
+        <item name="android:textColor">@color/text</item>
+    </style>
+
+    <style name="TabText">
+        <item name="android:textSize">@dimen/text_caption</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:letterSpacing">0.01</item>
+    </style>
+
+    <style name="Widget.IAOptimizer.Tab" parent="Widget.Material3.TabLayout">
+        <item name="tabBackground">@drawable/tab_bg</item>
+        <item name="tabIndicatorColor">@color/primary</item>
+        <item name="tabIndicatorHeight">5dp</item>
+        <item name="tabSelectedTextColor">@color/on_primary</item>
+        <item name="tabTextColor">@color/text_dim</item>
+        <item name="tabTextAppearance">@style/TabText</item>
+        <item name="tabRippleColor">@android:color/transparent</item>
+        <item name="tabMode">scrollable</item>
+        <item name="tabGravity">start</item>
+        <item name="tabMinWidth">0dp</item>
+        <item name="tabPaddingStart">@dimen/space_md</item>
+        <item name="tabPaddingEnd">@dimen/space_md</item>
+        <item name="tabPaddingTop">@dimen/space_sm</item>
+        <item name="tabPaddingBottom">@dimen/space_sm</item>
+    </style>
+</resources>

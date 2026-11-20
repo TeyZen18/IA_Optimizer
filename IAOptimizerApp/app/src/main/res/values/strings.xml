@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">IA Optimizer</string>
+    <string name="app_detail_title">Ajustes de app</string>
+
+    <string name="nav_ia_motors">IA Motors</string>
+    <string name="nav_inicio">Inicio</string>
+    <string name="nav_apps">Aplicaciones</string>
+    <string name="nav_games">Tus juegos</string>
+    <string name="nav_ajustes">Ajustes</string>
+
+    <string name="perfil_actual">Perfil actual</string>
+    <string name="perfil_eco">ECO</string>
+    <string name="perfil_balanced">Balanceado</string>
+    <string name="perfil_performance">Rendimiento</string>
+    <string name="modo_automatico">Modo automático</string>
+    <string name="ia_motor">IA Motors</string>
+    <string name="temperatura">Temperatura</string>
+    <string name="hz">Hz</string>
+    <string name="cpu">CPU</string>
+    <string name="gpu">GPU</string>
+    <string name="fps">FPS</string>
+    <string name="gobernador">Gobernador</string>
+    <string name="bateria">Batería</string>
+
+    <string name="buscar_app">Buscar aplicación…</string>
+    <string name="filtro_todas">Todas</string>
+    <string name="filtro_usuario">Usuario</string>
+    <string name="filtro_sistema">Sistema</string>
+    <string name="filtro_juegos">Juegos</string>
+
+    <string name="iniciar_juego">Iniciar juego</string>
+    <string name="abrir">Abrir</string>
+    <string name="marcar_juego">Marcar como juego</string>
+    <string name="hud_encendido">HUD encendido</string>
+    <string name="hud_apagado">HUD apagado</string>
+
+    <string name="ajustes_hud">HUD flotante</string>
+    <string name="ajustes_hud_desc">Muestra CPU, GPU y FPS sobre los juegos.</string>
+    <string name="permiso_superposicion">Permiso de superposición</string>
+    <string name="permiso_superposicion_desc">Necesario para dibujar el HUD sobre otras apps.</string>
+    <string name="estado_puente">Estado del puente Rust</string>
+    <string name="acerca_de">Acerca de</string>
+
+    <string name="sin_apps">No hay aplicaciones.</string>
+    <string name="sin_juegos">Todavía no hay juegos marcados.</string>
+    <string name="buscar_hint">Buscar por app, paquete o motivo…</string>
+
+    <string name="interruptor_principal">Interruptor principal</string>
+    <string name="modo_rendimiento_ligero">Modo de rendimiento ligero</string>
+    <string name="carga_bypass">Carga por bypass</string>
+    <string name="precarga">Precarga del juego</string>
+    <string name="tasa_refresco">Tasa de refresco</string>
+    <string name="motor_render">Motor de renderizado</string>
+    <string name="reducir_resolucion">Reducir resolución</string>
+    <string name="fps_objetivo">Tasa de fotogramas objetivo</string>
+    <string name="predeterminado">Predeterminado</string>
+    <string name="aplicar_ajustes">Aplicar ajustes ahora</string>
+
+    <string name="hud_notification_title">IA Optimizer HUD</string>
+    <string name="hud_notification_text">Telemetría flotante activa</string>
+    <string name="canal_hud">HUD en vivo</string>
+</resources>
