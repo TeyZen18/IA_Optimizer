@@ -119,6 +119,16 @@ app de sistema; también puede compilarse e instalarse por separado.
 
 ---
 
+## Capturas de pantalla
+
+| Inicio | IA Motors | Comandos en Línea | Panel in-game |
+|:---:|:---:|:---:|:---:|
+| <img src="docs/screenshots/01-inicio.png" width="210"> | <img src="docs/screenshots/02-ia-motors-resumen.png" width="210"> | <img src="docs/screenshots/06-comandos-en-linea.png" width="210"> | <img src="docs/screenshots/09-panel-in-game.png" width="300"> |
+
+Más vistas: [Controles por tarjetas](docs/screenshots/03-controles.png) · [Energía / Fuerza](docs/screenshots/05-fuerza-energia.png) · [Batería en vivo](docs/screenshots/04-fuerza-bateria.png) · [Aplicaciones](docs/screenshots/08-aplicaciones.png) · [Conocimiento por clúster](docs/screenshots/07-comandos-conocimiento.png).
+
+---
+
 ## Requisitos
 
 | Componente | Requisito |
